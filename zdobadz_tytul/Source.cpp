@@ -12,12 +12,12 @@
 #define FPS 60
 #define PREDKOSC_KUL 6
 #define OPOZNIENIE_STRZELANIA 0.6f
+#define MAX_BULLETS 100 // maksymalna ilosc pociskow na mapie
 
 enum KEYS { UP, DOWN, LEFT, RIGHT, SPACE };
 enum KEYS1 { W, S, A, D };
 
 int shot = 0;
-const int MAX_BULLETS = 100;
 
 typedef struct obiekt
 {
@@ -66,6 +66,7 @@ int zliczaj_enter_wybor = 0;
 int pos_x = 0;
 int pos_y = 0;
 int kierunek = -1;
+float DeltaTime = 1.0 / FPS;
 // wejsciowe
 ALLEGRO_BITMAP *BMP_WEJSCIOWE = NULL;
 ALLEGRO_BITMAP *BMP_NOWA_GRA = NULL;
@@ -88,7 +89,11 @@ ALLEGRO_BITMAP *BMP_POCISK = NULL;
 //////////
 ALLEGRO_BITMAP *BMP_POZIOM = NULL;
 ALLEGRO_BITMAP *BMP_SYMBOL = NULL;
-
+ALLEGRO_BITMAP *BMP_TEKSTURA1 = NULL;
+ALLEGRO_BITMAP *BMP_TEKSTURA2 = NULL;
+ALLEGRO_BITMAP *BMP_TEKSTURA3 = NULL;
+ALLEGRO_BITMAP *BMP_TEKSTURA4 = NULL;
+ALLEGRO_BITMAP *BMP_TEKSTURA5 = NULL;
 
 // mjuzik //
 ALLEGRO_SAMPLE *sample = NULL;
@@ -99,8 +104,12 @@ void rysuj_poziom(int ktory) {
 	case 1: {
 		BMP_WEJSCIOWE = al_load_bitmap("mapybmp/pierwsza.png");
 		BMP_SYMBOL = al_load_bitmap("mapybmp/I.png");
-		al_draw_bitmap(BMP_WEJSCIOWE, 0, 0, 0);
-		al_draw_bitmap(BMP_SYMBOL, width / 2 + 10, height - 80, 0);
+		BMP_TEKSTURA1 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA2 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA3 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA4 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA5 = al_load_bitmap("mapybmp/fiolka.png");
+		al_flip_display();
 		break;
 		}
 	}
@@ -109,17 +118,29 @@ void pre_start_game() {
 	ALLEGRO_EVENT_QUEUE *event_queue_stage = NULL;
 	ALLEGRO_TIMER *timer_stage = NULL;
 	int i, temp;
-	pos_x = width / 2 - 50;
-	pos_y = height-80;
+	pos_x = width / 2 - 100;
+	pos_y = height - 80;
 	kierunek = 0;
 	float tajmer = -1.0f;
 	event_queue_stage = al_create_event_queue();
-	timer_stage = al_create_timer(1.0 / FPS);
+	timer_stage = al_create_timer(DeltaTime);
 	al_start_timer(timer_stage);
 	/////////////// eventy
 	al_register_event_source(event_queue_stage, al_get_keyboard_event_source());
 	al_register_event_source(event_queue_stage, al_get_timer_event_source(timer_stage));
 	rysuj_poziom(1);
+	int SZEROKOSC_POCISK = al_get_bitmap_width(BMP_POCISK);
+	int SZEROKOSC_FIOLKA = al_get_bitmap_width(BMP_TEKSTURA1);
+	int WYSOKOSC_POCISK = al_get_bitmap_height(BMP_POCISK);
+	int WYSOKOSC_FIOLKA = al_get_bitmap_height(BMP_TEKSTURA1);
+	int SZEROKOSC_SYMBOL = al_get_bitmap_width(BMP_SYMBOL);
+	int WYSOKOSC_SYMBOL = al_get_bitmap_height(BMP_SYMBOL);
+	int WYSOKOSC_LUDEK = al_get_bitmap_height(BMP_POSTAC_GORA);
+	int SZEROKOSC_LUDEK = al_get_bitmap_width(BMP_POSTAC_GORA);
+	bool fiolka_zniszczona[5] = { false, false, false, false, false };
+	int fiolki_x[5] = { width / 2 - 55, width / 2 - 55 , width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1),width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1)*2 ,width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1)*2};
+	int fiolki_y[5] = { height - 70, height - 90 - al_get_bitmap_width(BMP_TEKSTURA1),height - 90 - al_get_bitmap_width(BMP_TEKSTURA1),height - 90 - al_get_bitmap_width(BMP_TEKSTURA1),height - 70 };
+	int SYMBOL[2] = { width / 2, height - 65 };
 	for (i = 0; i < MAX_BULLETS; i++)
 	{
 		bullets[i].alive = 0;
@@ -128,7 +149,7 @@ void pre_start_game() {
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue_stage, &ev);
 		if (tajmer > 0.0f) {
-			tajmer = tajmer - (1.0 / FPS);
+			tajmer = tajmer - (DeltaTime);
 		}
 		if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
 			switch (ev.keyboard.keycode)
@@ -189,6 +210,12 @@ void pre_start_game() {
 		}
 		else if (ev.type == ALLEGRO_EVENT_TIMER) {
 			al_draw_bitmap(BMP_WEJSCIOWE, 0, 0, 0);
+			al_draw_bitmap(BMP_SYMBOL, SYMBOL[0], SYMBOL[1], 0);
+			al_draw_bitmap(BMP_TEKSTURA1, fiolki_x[0], fiolki_y[0], 0);
+			al_draw_bitmap(BMP_TEKSTURA2, fiolki_x[1], fiolki_y[1], 0);
+			al_draw_bitmap(BMP_TEKSTURA3, fiolki_x[2], fiolki_y[2], 0);
+			al_draw_bitmap(BMP_TEKSTURA4, fiolki_x[3], fiolki_y[3], 0);
+			al_draw_bitmap(BMP_TEKSTURA5, fiolki_x[4], fiolki_y[4], 0);
 			for (i = 0; i < MAX_BULLETS; i++) 
 			{
 				if (bullets[i].alive == 1)
@@ -214,17 +241,45 @@ void pre_start_game() {
 				{
 					if (bullets[i].x < 0 || bullets[i].y < 0 || bullets[i].x > width || bullets[i].y > height)
 						bullets[i].alive = 0;
+					if (!fiolka_zniszczona[0] && bullets[i].x + SZEROKOSC_POCISK >= fiolki_x[0] && bullets[i].x <= fiolki_x[0] + SZEROKOSC_POCISK && bullets[i].y + WYSOKOSC_POCISK >= fiolki_y[0] && bullets[i].y <= fiolki_y[0] + WYSOKOSC_FIOLKA){
+					bullets[i].alive = 0;
+					BMP_TEKSTURA1 = al_load_bitmap("mapybmp/fiolka_zniszczona.png");
+					fiolka_zniszczona[0] = true;
+					}
+					if (!fiolka_zniszczona[1] && bullets[i].x + SZEROKOSC_POCISK >= fiolki_x[1] && bullets[i].x <= fiolki_x[1] + SZEROKOSC_POCISK && bullets[i].y + WYSOKOSC_POCISK >= fiolki_y[1] && bullets[i].y <= fiolki_y[1] + WYSOKOSC_FIOLKA) {
+						bullets[i].alive = 0;
+						BMP_TEKSTURA2 = al_load_bitmap("mapybmp/fiolka_zniszczona.png");
+						fiolka_zniszczona[1] = true;
+					}
+					if (!fiolka_zniszczona[2] && bullets[i].x + SZEROKOSC_POCISK >= fiolki_x[2] && bullets[i].x <= fiolki_x[2] + SZEROKOSC_POCISK && bullets[i].y + WYSOKOSC_POCISK >= fiolki_y[2] && bullets[i].y <= fiolki_y[2] + WYSOKOSC_FIOLKA) {
+						bullets[i].alive = 0;
+						BMP_TEKSTURA3 = al_load_bitmap("mapybmp/fiolka_zniszczona.png");
+						fiolka_zniszczona[2] = true;
+					}
+					if (!fiolka_zniszczona[3] && bullets[i].x + SZEROKOSC_POCISK >= fiolki_x[3] && bullets[i].x <= fiolki_x[3] + SZEROKOSC_POCISK && bullets[i].y + WYSOKOSC_POCISK >= fiolki_y[3] && bullets[i].y <= fiolki_y[3] + WYSOKOSC_FIOLKA) {
+						bullets[i].alive = 0;
+						BMP_TEKSTURA4 = al_load_bitmap("mapybmp/fiolka_zniszczona.png");
+						fiolka_zniszczona[3] = true;
+					}
+					if (!fiolka_zniszczona[4] && bullets[i].x + SZEROKOSC_POCISK >= fiolki_x[4] && bullets[i].x <= fiolki_x[4] + SZEROKOSC_POCISK && bullets[i].y + WYSOKOSC_POCISK >= fiolki_y[4] && bullets[i].y <= fiolki_y[4] + WYSOKOSC_FIOLKA) {
+						bullets[i].alive = 0;
+						BMP_TEKSTURA5 = al_load_bitmap("mapybmp/fiolka_zniszczona.png");
+						fiolka_zniszczona[4] = true;
+					}
+					if (bullets[i].x + SZEROKOSC_POCISK >= SYMBOL[0] && bullets[i].x <= SYMBOL[0] + SZEROKOSC_POCISK && bullets[i].y + WYSOKOSC_POCISK >= SYMBOL[1] && bullets[i].y <= SYMBOL[1] + WYSOKOSC_SYMBOL) {
+						bullets[i].alive = 0;
+						in_game = false;
+					}
 				}
 			}
-			al_draw_bitmap(BMP_SYMBOL, width / 2 + 10, height - 80, 0);
 			pos_y -= keys[UP] * 5;
 			pos_y += keys[DOWN] * 5;
 			pos_x -= keys[LEFT] * 5;
 			pos_x += keys[RIGHT] * 5;
 			if (pos_y <= 0) pos_y = 0;
 			if (pos_x <= 0) pos_x = 0;
-			if (pos_y + al_get_bitmap_height(BMP_POSTAC_DOL) >= height) pos_y = height - al_get_bitmap_height(BMP_POSTAC_DOL);
-			if (pos_x + al_get_bitmap_width(BMP_POSTAC_GORA) >= width) pos_x = width - al_get_bitmap_width(BMP_POSTAC_GORA);
+			if (pos_y + WYSOKOSC_LUDEK >= height) pos_y = height - WYSOKOSC_LUDEK;
+			if (pos_x + SZEROKOSC_LUDEK >= width) pos_x = width - SZEROKOSC_LUDEK;
 			switch (kierunek) {
 			case 0:al_draw_bitmap(BMP_POSTAC_GORA, pos_x, pos_y, 0); break;
 			case 1:al_draw_bitmap(BMP_POSTAC_DOL, pos_x, pos_y, 0); break;
@@ -236,7 +291,6 @@ void pre_start_game() {
 
 		}
 	}
-
 
 	int main(void) {
 		ALLEGRO_DISPLAY_MODE   disp_data;
@@ -303,7 +357,7 @@ void pre_start_game() {
 		al_draw_bitmap(BMP_ZAKONCZ, width / 2 - 190, height / 2 + 180, 0);
 		///////////////////// queue + timer 
 		event_queue = al_create_event_queue();
-		timer = al_create_timer(1.0 / FPS);
+		timer = al_create_timer(DeltaTime);
 	/////////////// eventy
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
@@ -490,6 +544,11 @@ void pre_start_game() {
 	al_destroy_bitmap(BMP_POSTAC_PRAWO);
 	al_destroy_bitmap(BMP_POSTAC);
 	al_destroy_bitmap(BMP_POZIOM);
+	al_destroy_bitmap(BMP_TEKSTURA1);
+	al_destroy_bitmap(BMP_TEKSTURA2);
+	al_destroy_bitmap(BMP_TEKSTURA3);
+	al_destroy_bitmap(BMP_TEKSTURA4);
+	al_destroy_bitmap(BMP_TEKSTURA5);
 	al_destroy_bitmap(BMP_POCISK);
 	al_destroy_event_queue(event_queue);
 }
