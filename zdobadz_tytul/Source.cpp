@@ -11,23 +11,28 @@
 
 #define FPS 60
 #define PREDKOSC_KUL 6
+#define PREDKOSC_PRZECIWNIKOW 5
 #define OPOZNIENIE_STRZELANIA 0.6f
 #define MAX_BULLETS 100 // maksymalna ilosc pociskow na mapie
+#define MAX_PRZECIWNIKOW 10
+#define PREDKOSC_POSTACI 5
+#define PRZECIWNICY_KIERUNEK 0.7f
 
 enum KEYS { UP, DOWN, LEFT, RIGHT, SPACE };
 enum KEYS1 { W, S, A, D };
 
 int shot = 0;
-
-typedef struct obiekt
-{
-	int x, y, kierunek, alive;
+int width;
+int height;
+typedef struct obiekt {
+	int x;
+	int y;
+	int alive;
+	int kierunek;
 } obiekt;
-
 obiekt bullets[MAX_BULLETS];
-int add_bullet(int x, int y, int kierunek)
+int add_bullet(int x, int y, int kierunek, int czyj_pocisk) // 0 - gracz 1 - komputer
 {
-
 	int i;
 
 	for (i = 0; i < MAX_BULLETS; i++) {
@@ -41,12 +46,39 @@ int add_bullet(int x, int y, int kierunek)
 
 	return(0); 
 }
+typedef struct przeciwnik {
+	int x;
+	int y;
+	int alive;
+	int lives;
+} przeciwnik;
 
+int add_enemy(przeciwnik Przeciwnik[]) {
+	for (int i = 0; i < MAX_PRZECIWNIKOW; i++) {
+		if (Przeciwnik[i].alive == 1) {
+			Przeciwnik[i].lives = 1;
+		}
+	}
+	return 0;
+}
+
+void create_enemy(przeciwnik Przeciwnik[]) {
+	for (int i = 0; i < MAX_PRZECIWNIKOW; i++) {
+		if (!Przeciwnik[i].alive) {
+			if (rand() % 500 == 0) {
+				Przeciwnik[i].alive = 1;
+				Przeciwnik[i].x = (rand() % width) + 30;
+				Przeciwnik[i].y = (rand() % height - 60) + 50;
+			}
+		}
+	}
+}
+
+
+przeciwnik Przeciwnik[MAX_PRZECIWNIKOW];
 // pocisk
 ////////////////////////
 
-int width;
-int height;
 
 ////////////inicjalizacja zmiennych//////////////
 bool wyszedl = false;
@@ -94,6 +126,7 @@ ALLEGRO_BITMAP *BMP_TEKSTURA2 = NULL;
 ALLEGRO_BITMAP *BMP_TEKSTURA3 = NULL;
 ALLEGRO_BITMAP *BMP_TEKSTURA4 = NULL;
 ALLEGRO_BITMAP *BMP_TEKSTURA5 = NULL;
+ALLEGRO_BITMAP *BMP_PRZECIWNIK = NULL;
 
 // mjuzik //
 ALLEGRO_SAMPLE *sample = NULL;
@@ -109,6 +142,7 @@ void rysuj_poziom(int ktory) {
 		BMP_TEKSTURA3 = al_load_bitmap("mapybmp/fiolka.png");
 		BMP_TEKSTURA4 = al_load_bitmap("mapybmp/fiolka.png");
 		BMP_TEKSTURA5 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka.png");
 		al_flip_display();
 		break;
 		}
@@ -117,11 +151,13 @@ void rysuj_poziom(int ktory) {
 void pre_start_game() {
 	ALLEGRO_EVENT_QUEUE *event_queue_stage = NULL;
 	ALLEGRO_TIMER *timer_stage = NULL;
+	srand(time(NULL));
 	int i, temp;
 	pos_x = width / 2 - 100;
 	pos_y = height - 80;
 	kierunek = 0;
 	float tajmer = -1.0f;
+	float tajmer_sterowanie_przeciwnikiem[MAX_PRZECIWNIKOW] = { -1.0f };
 	event_queue_stage = al_create_event_queue();
 	timer_stage = al_create_timer(DeltaTime);
 	al_start_timer(timer_stage);
@@ -137,6 +173,8 @@ void pre_start_game() {
 	int WYSOKOSC_SYMBOL = al_get_bitmap_height(BMP_SYMBOL);
 	int WYSOKOSC_LUDEK = al_get_bitmap_height(BMP_POSTAC_GORA);
 	int SZEROKOSC_LUDEK = al_get_bitmap_width(BMP_POSTAC_GORA);
+	int SZEROKOSC_PRZECIWNIK = al_get_bitmap_width(BMP_PRZECIWNIK);
+	int WYSOKOSC_PRZECIWNIK = al_get_bitmap_height(BMP_PRZECIWNIK);
 	bool fiolka_zniszczona[5] = { false, false, false, false, false };
 	int fiolki_x[5] = { width / 2 - 55, width / 2 - 55 , width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1),width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1)*2 ,width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1)*2};
 	int fiolki_y[5] = { height - 70, height - 90 - al_get_bitmap_width(BMP_TEKSTURA1),height - 90 - al_get_bitmap_width(BMP_TEKSTURA1),height - 90 - al_get_bitmap_width(BMP_TEKSTURA1),height - 70 };
@@ -148,9 +186,11 @@ void pre_start_game() {
 	while (opuscil_menu && in_game) {
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue_stage, &ev);
-		if (tajmer > 0.0f) {
+		if (tajmer > 0.0f)
 			tajmer = tajmer - (DeltaTime);
-		}
+		for(i=0; i<MAX_PRZECIWNIKOW; i++)
+		if (tajmer_sterowanie_przeciwnikiem[i] > 0.0f) 
+			tajmer_sterowanie_przeciwnikiem[i] = tajmer_sterowanie_przeciwnikiem[i] - (DeltaTime);
 		if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
 			switch (ev.keyboard.keycode)
 			{
@@ -174,10 +214,11 @@ void pre_start_game() {
 			case ALLEGRO_KEY_SPACE:
 				keys[SPACE] = true;
 				if (tajmer <= 0) {
-					temp = add_bullet(pos_x, pos_y + 20, kierunek);
+					temp = add_bullet(pos_x, pos_y + 20, kierunek, 0);
 					shot = 1;
 					bullets[temp].alive = 1;
 					tajmer = OPOZNIENIE_STRZELANIA;
+					
 				}
 				break;
 			}
@@ -216,11 +257,15 @@ void pre_start_game() {
 			al_draw_bitmap(BMP_TEKSTURA3, fiolki_x[2], fiolki_y[2], 0);
 			al_draw_bitmap(BMP_TEKSTURA4, fiolki_x[3], fiolki_y[3], 0);
 			al_draw_bitmap(BMP_TEKSTURA5, fiolki_x[4], fiolki_y[4], 0);
-			for (i = 0; i < MAX_BULLETS; i++) 
-			{
+			for (i = 0; i < MAX_BULLETS; i++) {
 				if (bullets[i].alive == 1)
 				{
 					al_draw_bitmap(BMP_POCISK, bullets[i].x, bullets[i].y, 0);
+				}
+			}
+			for (i = 0; i < MAX_PRZECIWNIKOW; i++){
+				if (Przeciwnik[i].alive == 1){
+					al_draw_bitmap(BMP_PRZECIWNIK, Przeciwnik[i].x, Przeciwnik[i].y, 0);
 				}
 			}
 			for (i = 0; i < MAX_BULLETS; i++)
@@ -235,12 +280,44 @@ void pre_start_game() {
 					}
 				}
 			}
+			for (i = 0; i < MAX_PRZECIWNIKOW; i++)
+			{
+				if (Przeciwnik[i].alive)
+				{
+					int random_x[MAX_PRZECIWNIKOW];
+					int random_y[MAX_PRZECIWNIKOW];
+					int losowa[MAX_PRZECIWNIKOW];
+					if (tajmer_sterowanie_przeciwnikiem[i] <= 0) {
+						losowa[i] = rand() % 4;
+						tajmer_sterowanie_przeciwnikiem[i] = PRZECIWNICY_KIERUNEK;
+						random_x[i] = rand() % PREDKOSC_PRZECIWNIKOW;
+						random_y[i] = rand() % PREDKOSC_PRZECIWNIKOW;
+					}
+					switch (losowa[i]) {
+					case 0: Przeciwnik[i].x += random_x[i]; break;
+					case 1: Przeciwnik[i].y += random_y[i]; break;
+					case 2: Przeciwnik[i].x -= random_x[i]; break;
+					case 3:Przeciwnik[i].y -= random_y[i]; break;
+					}
+					if (Przeciwnik[i].x < 0) { Przeciwnik[i].x = 0; tajmer_sterowanie_przeciwnikiem[i] = -1.0f; }
+					if (Przeciwnik[i].y < 0) { Przeciwnik[i].y = 0; tajmer_sterowanie_przeciwnikiem[i] = -1.0f; }
+					if (Przeciwnik[i].y + WYSOKOSC_PRZECIWNIK >= height) { Przeciwnik[i].y = height - WYSOKOSC_PRZECIWNIK; 						tajmer_sterowanie_przeciwnikiem[i] = -1.0f; }
+					if (Przeciwnik[i].x + SZEROKOSC_PRZECIWNIK >= width) { Przeciwnik[i].x = width - SZEROKOSC_PRZECIWNIK; 						tajmer_sterowanie_przeciwnikiem[i] = -1.0f;
+				}
+				}
+			}
 			for (i = 0; i < MAX_BULLETS; i++)
 			{
 				if (bullets[i].alive)
 				{
 					if (bullets[i].x < 0 || bullets[i].y < 0 || bullets[i].x > width || bullets[i].y > height)
 						bullets[i].alive = 0;
+					for (int j = 0; j < MAX_PRZECIWNIKOW; j++) {
+						if (bullets[i].x + SZEROKOSC_POCISK >= Przeciwnik[j].x && bullets[i].x <= Przeciwnik[j].x + SZEROKOSC_POCISK && bullets[i].y + WYSOKOSC_POCISK >= Przeciwnik[j].y && bullets[i].y <= Przeciwnik[j].y + WYSOKOSC_PRZECIWNIK) {
+							bullets[i].alive = 0;
+							Przeciwnik[j].alive = 0;
+						}
+					}
 					if (!fiolka_zniszczona[0] && bullets[i].x + SZEROKOSC_POCISK >= fiolki_x[0] && bullets[i].x <= fiolki_x[0] + SZEROKOSC_POCISK && bullets[i].y + WYSOKOSC_POCISK >= fiolki_y[0] && bullets[i].y <= fiolki_y[0] + WYSOKOSC_FIOLKA){
 					bullets[i].alive = 0;
 					BMP_TEKSTURA1 = al_load_bitmap("mapybmp/fiolka_zniszczona.png");
@@ -272,10 +349,10 @@ void pre_start_game() {
 					}
 				}
 			}
-			pos_y -= keys[UP] * 5;
-			pos_y += keys[DOWN] * 5;
-			pos_x -= keys[LEFT] * 5;
-			pos_x += keys[RIGHT] * 5;
+			pos_y -= keys[UP] * PREDKOSC_POSTACI;
+			pos_y += keys[DOWN] * PREDKOSC_POSTACI;
+			pos_x -= keys[LEFT] * PREDKOSC_POSTACI;
+			pos_x += keys[RIGHT] * PREDKOSC_POSTACI;
 			if (pos_y <= 0) pos_y = 0;
 			if (pos_x <= 0) pos_x = 0;
 			if (pos_y + WYSOKOSC_LUDEK >= height) pos_y = height - WYSOKOSC_LUDEK;
@@ -286,6 +363,7 @@ void pre_start_game() {
 			case 2:al_draw_bitmap(BMP_POSTAC_LEWO, pos_x, pos_y, 0); break;
 			case 3: al_draw_bitmap(BMP_POSTAC_PRAWO, pos_x, pos_y, 0); break;
 			}
+			create_enemy(Przeciwnik);
 			al_flip_display();
 		}
 
@@ -293,7 +371,7 @@ void pre_start_game() {
 	}
 
 	int main(void) {
-		ALLEGRO_DISPLAY_MODE   disp_data;
+		ALLEGRO_DISPLAY_MODE disp_data;
 		ALLEGRO_MONITOR_INFO Monitor_info;
 		ALLEGRO_DISPLAY *display = NULL;
 		ALLEGRO_EVENT_QUEUE *event_queue = NULL;
@@ -495,7 +573,7 @@ void pre_start_game() {
 
 				case 3:  zliczaj_enter--;  break;
 				case 4: wyszedl = true; break;
-				}
+				} 
 			}
 		}
 		else if (ev.type == ALLEGRO_EVENT_TIMER) {
@@ -550,5 +628,6 @@ void pre_start_game() {
 	al_destroy_bitmap(BMP_TEKSTURA4);
 	al_destroy_bitmap(BMP_TEKSTURA5);
 	al_destroy_bitmap(BMP_POCISK);
+	al_destroy_bitmap(BMP_PRZECIWNIK);
 	al_destroy_event_queue(event_queue);
 }
