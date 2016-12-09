@@ -14,9 +14,12 @@
 #define PREDKOSC_PRZECIWNIKOW 5
 #define OPOZNIENIE_STRZELANIA 0.6f
 #define MAX_BULLETS 100 // maksymalna ilosc pociskow na mapie
-#define MAX_PRZECIWNIKOW 10
+#define MAX_PRZECIWNIKOW 20
 #define PREDKOSC_POSTACI 5
-#define PRZECIWNICY_KIERUNEK 0.7f
+#define PRZECIWNICY_KIERUNEK 0.4f
+#define OPOZNIENIE_STRZELANIA_PRZECIWNICY 0.5f
+#define PRAWODOPOBIENSTWO_STRZALU_PRZECIWNIK 400
+#define PRAWDOPODOBIENSTWO_RESPAWN_PRZECIWNIK 2000
 
 enum KEYS { UP, DOWN, LEFT, RIGHT, SPACE };
 enum KEYS1 { W, S, A, D };
@@ -29,6 +32,7 @@ typedef struct obiekt {
 	int y;
 	int alive;
 	int kierunek;
+	int czyj;
 } obiekt;
 obiekt bullets[MAX_BULLETS];
 int add_bullet(int x, int y, int kierunek, int czyj_pocisk) // 0 - gracz 1 - komputer
@@ -40,6 +44,7 @@ int add_bullet(int x, int y, int kierunek, int czyj_pocisk) // 0 - gracz 1 - kom
 			bullets[i].x = x;
 			bullets[i].y = y;
 			bullets[i].kierunek = kierunek;
+			bullets[i].czyj = czyj_pocisk;
 			return i; 
 		}
 	}
@@ -65,7 +70,7 @@ int add_enemy(przeciwnik Przeciwnik[]) {
 void create_enemy(przeciwnik Przeciwnik[]) {
 	for (int i = 0; i < MAX_PRZECIWNIKOW; i++) {
 		if (!Przeciwnik[i].alive) {
-			if (rand() % 500 == 0) {
+			if (rand() % PRAWDOPODOBIENSTWO_RESPAWN_PRZECIWNIK == 0) {
 				Przeciwnik[i].alive = 1;
 				Przeciwnik[i].x = (rand() % width) + 30;
 				Przeciwnik[i].y = (rand() % height - 60) + 50;
@@ -127,6 +132,7 @@ ALLEGRO_BITMAP *BMP_TEKSTURA3 = NULL;
 ALLEGRO_BITMAP *BMP_TEKSTURA4 = NULL;
 ALLEGRO_BITMAP *BMP_TEKSTURA5 = NULL;
 ALLEGRO_BITMAP *BMP_PRZECIWNIK = NULL;
+ALLEGRO_BITMAP *BMP_POCISK_PRZECIWNIK = NULL;
 
 // mjuzik //
 ALLEGRO_SAMPLE *sample = NULL;
@@ -143,6 +149,7 @@ void rysuj_poziom(int ktory) {
 		BMP_TEKSTURA4 = al_load_bitmap("mapybmp/fiolka.png");
 		BMP_TEKSTURA5 = al_load_bitmap("mapybmp/fiolka.png");
 		BMP_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka.png");
+		BMP_POCISK_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka_pocisk.png");
 		al_flip_display();
 		break;
 		}
@@ -158,6 +165,7 @@ void pre_start_game() {
 	kierunek = 0;
 	float tajmer = -1.0f;
 	float tajmer_sterowanie_przeciwnikiem[MAX_PRZECIWNIKOW] = { -1.0f };
+	float tajmer_opoznienie_strzelania[MAX_PRZECIWNIKOW] = { -1.0f };
 	event_queue_stage = al_create_event_queue();
 	timer_stage = al_create_timer(DeltaTime);
 	al_start_timer(timer_stage);
@@ -188,6 +196,9 @@ void pre_start_game() {
 		al_wait_for_event(event_queue_stage, &ev);
 		if (tajmer > 0.0f)
 			tajmer = tajmer - (DeltaTime);
+		for (i = 0; i<MAX_PRZECIWNIKOW; i++)
+		if (tajmer_opoznienie_strzelania[i] > 0.0f)
+			tajmer_opoznienie_strzelania[i] = tajmer_opoznienie_strzelania[i] - (DeltaTime);
 		for(i=0; i<MAX_PRZECIWNIKOW; i++)
 		if (tajmer_sterowanie_przeciwnikiem[i] > 0.0f) 
 			tajmer_sterowanie_przeciwnikiem[i] = tajmer_sterowanie_przeciwnikiem[i] - (DeltaTime);
@@ -218,7 +229,6 @@ void pre_start_game() {
 					shot = 1;
 					bullets[temp].alive = 1;
 					tajmer = OPOZNIENIE_STRZELANIA;
-					
 				}
 				break;
 			}
@@ -260,7 +270,10 @@ void pre_start_game() {
 			for (i = 0; i < MAX_BULLETS; i++) {
 				if (bullets[i].alive == 1)
 				{
+					if(bullets[i].czyj == 0)
 					al_draw_bitmap(BMP_POCISK, bullets[i].x, bullets[i].y, 0);
+					if (bullets[i].czyj == 1)
+						al_draw_bitmap(BMP_POCISK_PRZECIWNIK, bullets[i].x, bullets[i].y, 0);
 				}
 			}
 			for (i = 0; i < MAX_PRZECIWNIKOW; i++){
@@ -293,6 +306,11 @@ void pre_start_game() {
 						random_x[i] = rand() % PREDKOSC_PRZECIWNIKOW;
 						random_y[i] = rand() % PREDKOSC_PRZECIWNIKOW;
 					}
+					if (tajmer_opoznienie_strzelania[i] <= 0 && rand()%PRAWODOPOBIENSTWO_STRZALU_PRZECIWNIK == 0) {
+						temp = add_bullet(Przeciwnik[i].x, Przeciwnik[i].y + 20, kierunek, 1);
+						bullets[temp].alive = 1;
+						tajmer_opoznienie_strzelania[i] = OPOZNIENIE_STRZELANIA_PRZECIWNICY;
+					}
 					switch (losowa[i]) {
 					case 0: Przeciwnik[i].x += random_x[i]; break;
 					case 1: Przeciwnik[i].y += random_y[i]; break;
@@ -313,10 +331,14 @@ void pre_start_game() {
 					if (bullets[i].x < 0 || bullets[i].y < 0 || bullets[i].x > width || bullets[i].y > height)
 						bullets[i].alive = 0;
 					for (int j = 0; j < MAX_PRZECIWNIKOW; j++) {
-						if (bullets[i].x + SZEROKOSC_POCISK >= Przeciwnik[j].x && bullets[i].x <= Przeciwnik[j].x + SZEROKOSC_POCISK && bullets[i].y + WYSOKOSC_POCISK >= Przeciwnik[j].y && bullets[i].y <= Przeciwnik[j].y + WYSOKOSC_PRZECIWNIK) {
+						if (bullets[i].czyj != 1 && bullets[i].x + SZEROKOSC_POCISK >= Przeciwnik[j].x && bullets[i].x <= Przeciwnik[j].x + SZEROKOSC_POCISK && bullets[i].y + WYSOKOSC_POCISK >= Przeciwnik[j].y && bullets[i].y <= Przeciwnik[j].y + WYSOKOSC_PRZECIWNIK) {
 							bullets[i].alive = 0;
 							Przeciwnik[j].alive = 0;
 						}
+					}
+					if (bullets[i].czyj == 1 && bullets[i].x + SZEROKOSC_POCISK >= pos_x && bullets[i].x <= pos_x + SZEROKOSC_POCISK && bullets[i].y + WYSOKOSC_POCISK >= pos_y && bullets[i].y <= pos_y + WYSOKOSC_LUDEK) {
+						bullets[i].alive = 0;
+						in_game = false;
 					}
 					if (!fiolka_zniszczona[0] && bullets[i].x + SZEROKOSC_POCISK >= fiolki_x[0] && bullets[i].x <= fiolki_x[0] + SZEROKOSC_POCISK && bullets[i].y + WYSOKOSC_POCISK >= fiolki_y[0] && bullets[i].y <= fiolki_y[0] + WYSOKOSC_FIOLKA){
 					bullets[i].alive = 0;
