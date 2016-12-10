@@ -16,12 +16,12 @@
 #define PREDKOSC_PRZECIWNIKOW 5
 #define OPOZNIENIE_STRZELANIA 0.6f
 #define MAX_BULLETS 100 // maksymalna ilosc pociskow na mapie
-#define MAX_PRZECIWNIKOW 20
+#define MAX_PRZECIWNIKOW 1
 #define PREDKOSC_POSTACI 5
 #define PRZECIWNICY_KIERUNEK 0.4f
 #define OPOZNIENIE_STRZELANIA_PRZECIWNICY 0.5f
 #define PRAWODOPOBIENSTWO_STRZALU_PRZECIWNIK 400
-#define PRAWDOPODOBIENSTWO_RESPAWN_PRZECIWNIK 2000
+#define PRAWDOPODOBIENSTWO_RESPAWN_PRZECIWNIK 1
 /////////////////////////////// KONFIGURACJA ////////////////////////////////
 
 ////////////inicjalizacja zmiennych//////////////
@@ -112,23 +112,16 @@ typedef struct przeciwnik {
 	int x;
 	int y;
 	int alive;
-	int lives;
+	int lifes;
+	int died;
 } przeciwnik;
-
-int add_enemy(przeciwnik Przeciwnik[]) {
-	for (int i = 0; i < MAX_PRZECIWNIKOW; i++) {
-		if (Przeciwnik[i].alive == 1) {
-			Przeciwnik[i].lives = 1;
-		}
-	}
-	return 0;
-}
 
 void create_enemy(przeciwnik Przeciwnik[]) {
 	for (int i = 0; i < MAX_PRZECIWNIKOW; i++) {
-		if (!Przeciwnik[i].alive) {
+		if (!Przeciwnik[i].alive && Przeciwnik[i].died != 1) {
 			if (rand() % PRAWDOPODOBIENSTWO_RESPAWN_PRZECIWNIK == 0) {
 				Przeciwnik[i].alive = 1;
+				Przeciwnik[i].lifes = 1;
 				Przeciwnik[i].x = (rand() % width) + 30;
 				Przeciwnik[i].y = (rand() % height - 60) + 50;
 			}
@@ -367,7 +360,10 @@ void pre_start_game() {
 					for (int j = 0; j < MAX_PRZECIWNIKOW; j++) {
 						if (bullets[i].czyj != 1 && collision(bullets[i].x, SZEROKOSC_POCISK, Przeciwnik[j].x, bullets[i].y, WYSOKOSC_POCISK, Przeciwnik[j].y, WYSOKOSC_PRZECIWNIK)) {
 							bullets[i].alive = 0;
-							Przeciwnik[j].alive = 0;
+							if (--Przeciwnik[j].lifes == 0) {
+								Przeciwnik[j].alive = 0;
+								Przeciwnik[j].died = 1;
+							}
 						}
 					}
 					if (bullets[i].czyj == 1 && collision(bullets[i].x, SZEROKOSC_POCISK, pos_x, bullets[i].y, WYSOKOSC_POCISK, pos_y, WYSOKOSC_LUDEK)) {
