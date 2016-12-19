@@ -10,7 +10,7 @@
 #include <ctime>
 
 
-/////////////////////////////// KONFIGURACJA ////////////////////////////////
+	/////////////////////////////// KONFIGURACJA ////////////////////////////////
 #define FPS 60
 #define PREDKOSC_KUL 6
 #define PREDKOSC_PRZECIWNIKOW 5
@@ -22,10 +22,10 @@
 #define OPOZNIENIE_STRZELANIA_PRZECIWNICY 0.5f
 #define PRAWODOPOBIENSTWO_STRZALU_PRZECIWNIK 400
 #define PRAWDOPODOBIENSTWO_RESPAWN_PRZECIWNIK 1
-/////////////////////////////// KONFIGURACJA ////////////////////////////////
+	/////////////////////////////// KONFIGURACJA ////////////////////////////////
 
-////////////inicjalizacja zmiennych//////////////
-bool wyszedl = false;
+	////////////inicjalizacja zmiennych//////////////
+	bool wyszedl = false;
 bool powrocil = true;
 bool zablokowane[] = { false };
 bool keys[5] = { false, false, false, false, false };
@@ -43,6 +43,12 @@ int pos_x = 0;
 int pos_y = 0;
 int kierunek = -1;
 float DeltaTime = 1.0 / FPS;
+int poziom = 1;
+int enemies_killed = 0;
+bool fiolka_zniszczona[5] = { false, false, false, false, false };
+float tajmer_opoznienie_gracz = -1.0f;
+float tajmer_sterowanie_przeciwnikiem[MAX_PRZECIWNIKOW] = { -1.0f };
+float tajmer_opoznienie_strzelania[MAX_PRZECIWNIKOW] = { -1.0f };
 enum KEYS { UP, DOWN, LEFT, RIGHT, SPACE };
 enum KEYS1 { W, S, A, D };
 // wejsciowe
@@ -72,6 +78,7 @@ ALLEGRO_BITMAP *BMP_TEKSTURA2 = NULL;
 ALLEGRO_BITMAP *BMP_TEKSTURA3 = NULL;
 ALLEGRO_BITMAP *BMP_TEKSTURA4 = NULL;
 ALLEGRO_BITMAP *BMP_TEKSTURA5 = NULL;
+ALLEGRO_BITMAP *BMP_SEMESTR_OVER = NULL;
 ALLEGRO_BITMAP *BMP_PRZECIWNIK = NULL;
 ALLEGRO_BITMAP *BMP_POCISK_PRZECIWNIK = NULL;
 
@@ -101,11 +108,11 @@ int add_bullet(int x, int y, int kierunek, int czyj_pocisk) // 0 - gracz 1 - kom
 			bullets[i].y = y;
 			bullets[i].kierunek = kierunek;
 			bullets[i].czyj = czyj_pocisk;
-			return i; 
+			return i;
 		}
 	}
 
-	return(0); 
+	return(0);
 }
 
 typedef struct przeciwnik {
@@ -167,12 +174,114 @@ void rysuj_poziom(int ktory) {
 		BMP_TEKSTURA3 = al_load_bitmap("mapybmp/fiolka.png");
 		BMP_TEKSTURA4 = al_load_bitmap("mapybmp/fiolka.png");
 		BMP_TEKSTURA5 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_SEMESTR_OVER = al_load_bitmap("mapybmp/1_semestr_koniec.png");
 		BMP_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka.png");
 		BMP_POCISK_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka_pocisk.png");
 		al_flip_display();
 		break;
-		}
 	}
+	case 2: {
+		BMP_WEJSCIOWE = al_load_bitmap("mapybmp/pierwsza.png");
+		BMP_SYMBOL = al_load_bitmap("mapybmp/II.png");
+		BMP_TEKSTURA1 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA2 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA3 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA4 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA5 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka.png");
+		BMP_POCISK_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		BMP_SEMESTR_OVER = al_load_bitmap("mapybmp/2_semestr_koniec.png");
+		al_flip_display();
+		break;
+	}
+	case 3: {
+		BMP_WEJSCIOWE = al_load_bitmap("mapybmp/pierwsza.png");
+		BMP_SYMBOL = al_load_bitmap("mapybmp/II.png");
+		BMP_TEKSTURA1 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA2 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA3 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA4 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA5 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka.png");
+		BMP_POCISK_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		BMP_SEMESTR_OVER = al_load_bitmap("mapybmp/3_semestr_koniec.png");
+		al_flip_display();
+		break;
+	}
+	case 4: {
+		BMP_WEJSCIOWE = al_load_bitmap("mapybmp/pierwsza.png");
+		BMP_SYMBOL = al_load_bitmap("mapybmp/II.png");
+		BMP_TEKSTURA1 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA2 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA3 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA4 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA5 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka.png");
+		BMP_POCISK_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		BMP_SEMESTR_OVER = al_load_bitmap("mapybmp/4_semestr_koniec.png");
+		al_flip_display();
+		break;
+	}
+	case 5: {
+		BMP_WEJSCIOWE = al_load_bitmap("mapybmp/pierwsza.png");
+		BMP_SYMBOL = al_load_bitmap("mapybmp/II.png");
+		BMP_TEKSTURA1 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA2 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA3 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA4 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA5 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka.png");
+		BMP_POCISK_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		BMP_SEMESTR_OVER = al_load_bitmap("mapybmp/5_semestr_koniec.png");
+		al_flip_display();
+		break;
+	}
+	case 6: {
+		BMP_WEJSCIOWE = al_load_bitmap("mapybmp/pierwsza.png");
+		BMP_SYMBOL = al_load_bitmap("mapybmp/II.png");
+		BMP_TEKSTURA1 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA2 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA3 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA4 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA5 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka.png");
+		BMP_POCISK_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		BMP_SEMESTR_OVER = al_load_bitmap("mapybmp/6_semestr_koniec.png");
+		al_flip_display();
+		break;
+	}
+	case 7: {
+		BMP_WEJSCIOWE = al_load_bitmap("mapybmp/pierwsza.png");
+		BMP_SYMBOL = al_load_bitmap("mapybmp/II.png");
+		BMP_TEKSTURA1 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA2 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA3 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA4 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEKSTURA5 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka.png");
+		BMP_POCISK_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		BMP_SEMESTR_OVER = al_load_bitmap("mapybmp/6_semestr_koniec.png");
+		al_flip_display();
+		break;
+	}
+	}
+}
+void clean_everything() {
+	pos_x = width / 2 - 100;
+	pos_y = height - 80;
+	kierunek = 0;
+	for (int i = 0; i < 5; i++) {
+		fiolka_zniszczona[i] = false;
+	}
+	for (int i = 0; i < MAX_PRZECIWNIKOW; i++) {
+		Przeciwnik[i].died = 0;
+		tajmer_sterowanie_przeciwnikiem[i] = -1.0f;
+		tajmer_opoznienie_strzelania[i] = -1.0f;
+	}
+	for(int j = 0; j < MAX_BULLETS; j++) {
+		bullets[j].alive = 0;
+	}
+	al_flip_display();
 }
 bool collision(int pos_x1, int width_x1, int pos_x2, int pos_y1, int height_y1, int pos_y2, int height_y2) {
 	if (pos_x1 + width_x1 >= pos_x2 && pos_x1 <= pos_x2 + width_x1 && pos_y1 + height_y1 >= pos_y2 && pos_y1 <= pos_y2 + height_y2)
@@ -184,12 +293,6 @@ void pre_start_game() {
 	ALLEGRO_TIMER *timer_stage = NULL;
 	srand(time(NULL));
 	int i, temp;
-	pos_x = width / 2 - 100;
-	pos_y = height - 80;
-	kierunek = 0;
-	float tajmer_opoznienie_gracz = -1.0f;
-	float tajmer_sterowanie_przeciwnikiem[MAX_PRZECIWNIKOW] = { -1.0f };
-	float tajmer_opoznienie_strzelania[MAX_PRZECIWNIKOW] = { -1.0f };
 	event_queue_stage = al_create_event_queue();
 	timer_stage = al_create_timer(DeltaTime);
 	al_start_timer(timer_stage);
@@ -208,10 +311,10 @@ void pre_start_game() {
 	int WYSOKOSC_PRZECIWNIK = al_get_bitmap_height(BMP_PRZECIWNIK);
 	int ostatnia_pozycja_gracz[2] = { pos_x, pos_y };
 	int ostatnia_pozycja_komputer[MAX_PRZECIWNIKOW][2];
-	bool fiolka_zniszczona[5] = { false, false, false, false, false };
-	int fiolki_x[5] = { width / 2 - 55, width / 2 - 55 , width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1),width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1)*2 ,width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1)*2};
+	int fiolki_x[5] = { width / 2 - 55, width / 2 - 55 , width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1),width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1) * 2 ,width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1) * 2 };
 	int fiolki_y[5] = { height - 70, height - 90 - al_get_bitmap_width(BMP_TEKSTURA1),height - 90 - al_get_bitmap_width(BMP_TEKSTURA1),height - 90 - al_get_bitmap_width(BMP_TEKSTURA1),height - 70 };
 	int SYMBOL[2] = { width / 2, height - 65 };
+	clean_everything();
 	while (opuscil_menu && in_game) {
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue_stage, &ev);
@@ -364,6 +467,16 @@ void pre_start_game() {
 								Przeciwnik[j].alive = 0;
 								Przeciwnik[j].died = 1;
 							}
+							if (++enemies_killed == MAX_PRZECIWNIKOW) {
+								al_draw_bitmap(BMP_SEMESTR_OVER, width / 3, height / 2, 0);
+								al_flip_display();
+								al_stop_timer(timer_stage);
+								clean_everything();
+								enemies_killed = 0;
+								al_rest(10.0);
+								al_start_timer(timer_stage);
+								rysuj_poziom(++poziom);
+							}
 						}
 					}
 					if (bullets[i].czyj == 1 && collision(bullets[i].x, SZEROKOSC_POCISK, pos_x, bullets[i].y, WYSOKOSC_POCISK, pos_y, WYSOKOSC_LUDEK)) {
@@ -446,75 +559,75 @@ void pre_start_game() {
 			al_flip_display();
 		}
 
-		}
 	}
+}
 
 int main(void) {
-		ALLEGRO_DISPLAY_MODE disp_data;
-		ALLEGRO_MONITOR_INFO Monitor_info;
-		ALLEGRO_DISPLAY *display = NULL;
-		ALLEGRO_EVENT_QUEUE *event_queue = NULL;
-		ALLEGRO_TIMER *timer = NULL;
-		if (!al_init())
-			return -1;
-		if (!al_install_audio()) {
-			return -1;
-		}
-		if (!al_init_acodec_addon()) {
-			return -1;
-		}
-		if (!al_reserve_samples(1)) {
-			return -1;
-		}
-		al_get_monitor_info(0, &Monitor_info);
-		width = (int)Monitor_info.x2;
-		height = (int)Monitor_info.y2;
+	ALLEGRO_DISPLAY_MODE disp_data;
+	ALLEGRO_MONITOR_INFO Monitor_info;
+	ALLEGRO_DISPLAY *display = NULL;
+	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
+	ALLEGRO_TIMER *timer = NULL;
+	if (!al_init())
+		return -1;
+	if (!al_install_audio()) {
+		return -1;
+	}
+	if (!al_init_acodec_addon()) {
+		return -1;
+	}
+	if (!al_reserve_samples(1)) {
+		return -1;
+	}
+	al_get_monitor_info(0, &Monitor_info);
+	width = (int)Monitor_info.x2;
+	height = (int)Monitor_info.y2;
 
-		al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
-		display = al_create_display(width, height);
-		if (!display)
-			return -1;
-		sample = al_load_sample("dzwieki/main.wav");
-		if (!sample) {
-			return -1;
-		}
-		///////////// addony////////////////
-		al_init_font_addon();
-		al_install_mouse();
-		al_init_ttf_addon();
-		al_init_image_addon();
-		al_init_primitives_addon();
-		al_install_keyboard();
-		//ladowanie bitmap/////
-		al_set_window_title(display, "Priceless Paper");
-		BMP_WEJSCIOWE = al_load_bitmap("wejsciowe/tlo_podstawowe2.png");
-		BMP_NOWA_GRA = al_load_bitmap("wejsciowe/NOWA_GRA_WYBRANE.png");
-		BMP_CREDITS = al_load_bitmap("wejsciowe/CREDITS.png");
-		BMP_ZAKONCZ = al_load_bitmap("wejsciowe/ZAKONCZ_GRE.png");
-		BMP_OPCJE = al_load_bitmap("wejsciowe/OPCJE.png");
-		BMP_REKORDY = al_load_bitmap("wejsciowe/REKORDY.PNG");
-		BMP_JEDEN_GRACZ = al_load_bitmap("wejsciowe/JEDEN_GRACZ.png");
-		BMP_DWOCH_GRACZY = al_load_bitmap("wejsciowe/DWOCH_GRACZY.png");
-		BMP_MUZYKA = al_load_bitmap("wejsciowe/MUZYKA.png");
-		BMP_MUZYKA_STAN = al_load_bitmap("wejsciowe/WLACZONA.png");
-		BMP_POSTAC_GORA = al_load_bitmap("studentbmp/polnoc.png");
-		BMP_POSTAC_DOL = al_load_bitmap("studentbmp/poludnie.png");
-		BMP_POSTAC_PRAWO = al_load_bitmap("studentbmp/prawo.png");
-		BMP_POSTAC_LEWO = al_load_bitmap("studentbmp/lewo.png");
-		BMP_POCISK = al_load_bitmap("studentbmp/atak_podstawowy.png");
-		ikona = al_load_bitmap("wejsciowe/ikona.png");
-		al_set_display_icon(display, ikona);
-		al_hide_mouse_cursor(display);
-		////////// rysowanie poczatkowego menu //////////////////
-		al_draw_bitmap(BMP_WEJSCIOWE, 0, 0, 0);
-		al_draw_bitmap(BMP_NOWA_GRA, width / 2 - 190, height / 2 - 40, 0);
-		al_draw_bitmap(BMP_REKORDY, width / 2 - 190, height / 2 + 15, 0);
-		al_draw_bitmap(BMP_OPCJE, width / 2 - 190, height / 2 + 70, 0);
-		al_draw_bitmap(BMP_CREDITS, width / 2 - 190, height / 2 + 125, 0);
-		al_draw_bitmap(BMP_ZAKONCZ, width / 2 - 190, height / 2 + 180, 0);
-		///////////////////// queue + timer 
-		event_queue = al_create_event_queue();
-		timer = al_create_timer(DeltaTime);
+	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
+	display = al_create_display(width, height);
+	if (!display)
+		return -1;
+	sample = al_load_sample("dzwieki/main.wav");
+	if (!sample) {
+		return -1;
+	}
+	///////////// addony////////////////
+	al_init_font_addon();
+	al_install_mouse();
+	al_init_ttf_addon();
+	al_init_image_addon();
+	al_init_primitives_addon();
+	al_install_keyboard();
+	//ladowanie bitmap/////
+	al_set_window_title(display, "Priceless Paper");
+	BMP_WEJSCIOWE = al_load_bitmap("wejsciowe/tlo_podstawowe2.png");
+	BMP_NOWA_GRA = al_load_bitmap("wejsciowe/NOWA_GRA_WYBRANE.png");
+	BMP_CREDITS = al_load_bitmap("wejsciowe/CREDITS.png");
+	BMP_ZAKONCZ = al_load_bitmap("wejsciowe/ZAKONCZ_GRE.png");
+	BMP_OPCJE = al_load_bitmap("wejsciowe/OPCJE.png");
+	BMP_REKORDY = al_load_bitmap("wejsciowe/REKORDY.PNG");
+	BMP_JEDEN_GRACZ = al_load_bitmap("wejsciowe/JEDEN_GRACZ.png");
+	BMP_DWOCH_GRACZY = al_load_bitmap("wejsciowe/DWOCH_GRACZY.png");
+	BMP_MUZYKA = al_load_bitmap("wejsciowe/MUZYKA.png");
+	BMP_MUZYKA_STAN = al_load_bitmap("wejsciowe/WLACZONA.png");
+	BMP_POSTAC_GORA = al_load_bitmap("studentbmp/polnoc.png");
+	BMP_POSTAC_DOL = al_load_bitmap("studentbmp/poludnie.png");
+	BMP_POSTAC_PRAWO = al_load_bitmap("studentbmp/prawo.png");
+	BMP_POSTAC_LEWO = al_load_bitmap("studentbmp/lewo.png");
+	BMP_POCISK = al_load_bitmap("studentbmp/atak_podstawowy.png");
+	ikona = al_load_bitmap("wejsciowe/ikona.png");
+	al_set_display_icon(display, ikona);
+	al_hide_mouse_cursor(display);
+	////////// rysowanie poczatkowego menu //////////////////
+	al_draw_bitmap(BMP_WEJSCIOWE, 0, 0, 0);
+	al_draw_bitmap(BMP_NOWA_GRA, width / 2 - 190, height / 2 - 40, 0);
+	al_draw_bitmap(BMP_REKORDY, width / 2 - 190, height / 2 + 15, 0);
+	al_draw_bitmap(BMP_OPCJE, width / 2 - 190, height / 2 + 70, 0);
+	al_draw_bitmap(BMP_CREDITS, width / 2 - 190, height / 2 + 125, 0);
+	al_draw_bitmap(BMP_ZAKONCZ, width / 2 - 190, height / 2 + 180, 0);
+	///////////////////// queue + timer 
+	event_queue = al_create_event_queue();
+	timer = al_create_timer(DeltaTime);
 	/////////////// eventy
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
@@ -652,7 +765,7 @@ int main(void) {
 
 				case 3:  zliczaj_enter--;  break;
 				case 4: wyszedl = true; break;
-				} 
+				}
 			}
 		}
 		else if (ev.type == ALLEGRO_EVENT_TIMER) {
@@ -706,6 +819,7 @@ int main(void) {
 	al_destroy_bitmap(BMP_TEKSTURA3);
 	al_destroy_bitmap(BMP_TEKSTURA4);
 	al_destroy_bitmap(BMP_TEKSTURA5);
+	al_destroy_bitmap(BMP_SEMESTR_OVER);
 	al_destroy_bitmap(BMP_POCISK);
 	al_destroy_bitmap(BMP_PRZECIWNIK);
 	al_destroy_event_queue(event_queue);
