@@ -16,12 +16,13 @@
 #define PREDKOSC_PRZECIWNIKOW 5
 #define OPOZNIENIE_STRZELANIA 0.6f
 #define MAX_BULLETS 100 // maksymalna ilosc pociskow na mapie
-#define MAX_PRZECIWNIKOW 1
+#define MAX_PRZECIWNIKOW 5
 #define PREDKOSC_POSTACI 5
 #define PRZECIWNICY_KIERUNEK 0.4f
 #define OPOZNIENIE_STRZELANIA_PRZECIWNICY 0.5f
 #define PRAWODOPOBIENSTWO_STRZALU_PRZECIWNIK 400
 #define PRAWDOPODOBIENSTWO_RESPAWN_PRZECIWNIK 1
+#define PRAWDOPODOBIENSTWO_RESPAWN_BOSS 10
 	/////////////////////////////// KONFIGURACJA ////////////////////////////////
 
 	////////////inicjalizacja zmiennych//////////////
@@ -80,6 +81,7 @@ ALLEGRO_BITMAP *BMP_TEKSTURA4 = NULL;
 ALLEGRO_BITMAP *BMP_TEKSTURA5 = NULL;
 ALLEGRO_BITMAP *BMP_SEMESTR_OVER = NULL;
 ALLEGRO_BITMAP *BMP_PRZECIWNIK = NULL;
+ALLEGRO_BITMAP *BMP_PRZECIWNIK_BOSS = NULL;
 ALLEGRO_BITMAP *BMP_POCISK_PRZECIWNIK = NULL;
 
 // mjuzik //
@@ -121,6 +123,7 @@ typedef struct przeciwnik {
 	int alive;
 	int lifes;
 	int died;
+	int boss;
 } przeciwnik;
 
 void create_enemy(przeciwnik Przeciwnik[]) {
@@ -131,6 +134,10 @@ void create_enemy(przeciwnik Przeciwnik[]) {
 				Przeciwnik[i].lifes = 1;
 				Przeciwnik[i].x = (rand() % width) + 30;
 				Przeciwnik[i].y = (rand() % height - 60) + 50;
+				if (rand() % PRAWDOPODOBIENSTWO_RESPAWN_BOSS == 0) {
+					Przeciwnik[i].boss = 1;
+					Przeciwnik[i].lifes = 2;
+				}
 			}
 		}
 	}
@@ -157,8 +164,12 @@ void draw_bullets(obiekt bullets[]) {
 void draw_enemies(przeciwnik Przeciwnik[]) {
 	int i;
 	for (i = 0; i < MAX_PRZECIWNIKOW; i++)
-		if (Przeciwnik[i].alive == 1)
+		if (Przeciwnik[i].alive == 1 && Przeciwnik[i].died == 0) {
 			al_draw_bitmap(BMP_PRZECIWNIK, Przeciwnik[i].x, Przeciwnik[i].y, 0);
+			if (Przeciwnik[i].boss == 1) {
+				al_draw_bitmap(BMP_PRZECIWNIK_BOSS, Przeciwnik[i].x, Przeciwnik[i].y, 0);
+			}
+		}
 }
 przeciwnik Przeciwnik[MAX_PRZECIWNIKOW];
 
@@ -176,6 +187,7 @@ void rysuj_poziom(int ktory) {
 		BMP_TEKSTURA5 = al_load_bitmap("mapybmp/fiolka.png");
 		BMP_SEMESTR_OVER = al_load_bitmap("mapybmp/1_semestr_koniec.png");
 		BMP_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka.png");
+		BMP_PRZECIWNIK_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
 		BMP_POCISK_PRZECIWNIK = al_load_bitmap("przeciwnicy/calka_pocisk.png");
 		al_flip_display();
 		break;
@@ -461,13 +473,14 @@ void pre_start_game() {
 					if (bullets[i].x < 0 || bullets[i].y < 0 || bullets[i].x > width || bullets[i].y > height)
 						bullets[i].alive = 0;
 					for (int j = 0; j < MAX_PRZECIWNIKOW; j++) {
-						if (bullets[i].czyj != 1 && collision(bullets[i].x, SZEROKOSC_POCISK, Przeciwnik[j].x, bullets[i].y, WYSOKOSC_POCISK, Przeciwnik[j].y, WYSOKOSC_PRZECIWNIK)) {
+						if (bullets[i].czyj != 1 && Przeciwnik[j].died == 0 && Przeciwnik[j].alive && collision(bullets[i].x, SZEROKOSC_POCISK, Przeciwnik[j].x, bullets[i].y, WYSOKOSC_POCISK, Przeciwnik[j].y, WYSOKOSC_PRZECIWNIK)) {
 							bullets[i].alive = 0;
 							if (--Przeciwnik[j].lifes == 0) {
 								Przeciwnik[j].alive = 0;
 								Przeciwnik[j].died = 1;
 							}
 							if (++enemies_killed == MAX_PRZECIWNIKOW) {
+								al_draw_bitmap(BMP_WEJSCIOWE, 0, 0, 0);
 								al_draw_bitmap(BMP_SEMESTR_OVER, width / 3, height / 2, 0);
 								al_flip_display();
 								al_stop_timer(timer_stage);
