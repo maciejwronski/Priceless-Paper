@@ -134,6 +134,13 @@ void create_enemy(przeciwnik Przeciwnik[]) {
 				Przeciwnik[i].lifes = 1;
 				Przeciwnik[i].x = (rand() % width) + 30;
 				Przeciwnik[i].y = (rand() % height - 60) + 50;
+				while (Przeciwnik[i].x >= width / 2 - 150  && Przeciwnik[i].x <= width / 2 + al_get_bitmap_width(BMP_TEKSTURA1) * 2 && Przeciwnik[i].y >= height - 150 - al_get_bitmap_width(BMP_TEKSTURA1)) {
+					Przeciwnik[i].x = (rand() % width) + 30;
+				}
+			/*/	while (Przeciwnik[i].y >= height - 150 - al_get_bitmap_width(BMP_TEKSTURA1)) {
+					Przeciwnik[i].y = (rand() % height - 60) + 50;
+				}/*/
+
 				if (rand() % PRAWDOPODOBIENSTWO_RESPAWN_BOSS == 0) {
 					Przeciwnik[i].boss = 1;
 					Przeciwnik[i].lifes = 2;
@@ -478,8 +485,9 @@ void pre_start_game() {
 							if (--Przeciwnik[j].lifes == 0) {
 								Przeciwnik[j].alive = 0;
 								Przeciwnik[j].died = 1;
+								enemies_killed++;
 							}
-							if (++enemies_killed == MAX_PRZECIWNIKOW) {
+							if (enemies_killed == MAX_PRZECIWNIKOW) {
 								al_draw_bitmap(BMP_WEJSCIOWE, 0, 0, 0);
 								al_draw_bitmap(BMP_SEMESTR_OVER, width / 3, height / 2, 0);
 								al_flip_display();
