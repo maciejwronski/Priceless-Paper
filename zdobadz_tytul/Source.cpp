@@ -30,7 +30,7 @@
 bool powrocil = true;
 bool zablokowane[] = { false };
 bool keys[5] = { false, false, false, false, false };
-bool keys1[4] = { false, false, false, false };
+bool keys1[5] = { false, false, false, false, false };
 int menu[] = { 0, 0, 0 };
 int zliczaj_enter = 0;
 int zapamietaj, jeszcze_jeden_enter;
@@ -42,16 +42,20 @@ bool wybor_ilosci_graczy[2] = { false, false };
 int zliczaj_enter_wybor = 0;
 int pos_x = 0;
 int pos_y = 0;
-int kierunek = -1;
+int pos2_x = 0;
+int pos2_y = 0;
+int player_alive[2] = { true, true };
+int kierunek[2] = { -1 };
 float DeltaTime = 1.0 / FPS;
 int poziom = 1;
 int enemies_killed = 0;
 bool fiolka_zniszczona[5] = { false, false, false, false, false };
 float tajmer_opoznienie_gracz = -1.0f;
+float tajmer_opoznienie_gracz2 = -1.0f;
 float tajmer_sterowanie_przeciwnikiem[MAX_PRZECIWNIKOW] = { -1.0f };
 float tajmer_opoznienie_strzelania[MAX_PRZECIWNIKOW] = { -1.0f };
 enum KEYS { UP, DOWN, LEFT, RIGHT, SPACE };
-enum KEYS1 { W, S, A, D };
+enum KEYS1 { W, S, A, D, CAPS };
 // wejsciowe
 ALLEGRO_BITMAP *BMP_WEJSCIOWE = NULL;
 ALLEGRO_BITMAP *BMP_NOWA_GRA = NULL;
@@ -71,6 +75,12 @@ ALLEGRO_BITMAP *BMP_POSTAC_LEWO = NULL;
 ALLEGRO_BITMAP *BMP_POSTAC_PRAWO = NULL;
 ALLEGRO_BITMAP *BMP_POSTAC = NULL;
 ALLEGRO_BITMAP *BMP_POCISK = NULL;
+ALLEGRO_BITMAP *BMP_POSTAC_GORA_2 = NULL;
+ALLEGRO_BITMAP *BMP_POSTAC_DOL_2 = NULL;
+ALLEGRO_BITMAP *BMP_POSTAC_LEWO_2 = NULL;
+ALLEGRO_BITMAP *BMP_POSTAC_PRAWO_2 = NULL;
+ALLEGRO_BITMAP *BMP_POSTAC_2 = NULL;
+ALLEGRO_BITMAP *BMP_POCISK_2 = NULL;
 //////////
 ALLEGRO_BITMAP *BMP_POZIOM = NULL;
 ALLEGRO_BITMAP *BMP_SYMBOL = NULL;
@@ -137,10 +147,6 @@ void create_enemy(przeciwnik Przeciwnik[]) {
 				while (Przeciwnik[i].x >= width / 2 - 150  && Przeciwnik[i].x <= width / 2 + al_get_bitmap_width(BMP_TEKSTURA1) * 2 && Przeciwnik[i].y >= height - 150 - al_get_bitmap_width(BMP_TEKSTURA1)) {
 					Przeciwnik[i].x = (rand() % width) + 30;
 				}
-			/*/	while (Przeciwnik[i].y >= height - 150 - al_get_bitmap_width(BMP_TEKSTURA1)) {
-					Przeciwnik[i].y = (rand() % height - 60) + 50;
-				}/*/
-
 				if (rand() % PRAWDOPODOBIENSTWO_RESPAWN_BOSS == 0) {
 					Przeciwnik[i].boss = 1;
 					Przeciwnik[i].lifes = 2;
@@ -159,6 +165,8 @@ void draw_bullets(obiekt bullets[]) {
 				al_draw_bitmap(BMP_POCISK, bullets[i].x, bullets[i].y, 0);
 			if (bullets[i].czyj == 1)
 				al_draw_bitmap(BMP_POCISK_PRZECIWNIK, bullets[i].x, bullets[i].y, 0);
+			if (bullets[i].czyj == 2)
+				al_draw_bitmap(BMP_POCISK_2, bullets[i].x, bullets[i].y, 0);
 			switch (bullets[i].kierunek) {
 			case 0: bullets[i].y -= PREDKOSC_KUL; break;
 			case 1: bullets[i].y += PREDKOSC_KUL; break;
@@ -179,6 +187,7 @@ void draw_enemies(przeciwnik Przeciwnik[]) {
 		}
 }
 przeciwnik Przeciwnik[MAX_PRZECIWNIKOW];
+
 
 
 
@@ -286,9 +295,17 @@ void rysuj_poziom(int ktory) {
 	}
 }
 void clean_everything() {
-	pos_x = width / 2 - 100;
-	pos_y = height - 80;
-	kierunek = 0;
+	if (wybor_ilosci_graczy[0] == true) {
+		pos_x = width / 2 - 100;
+		pos_y = height - 80;
+		kierunek[0] = 0;
+	}
+	if (wybor_ilosci_graczy[1] == true) {
+		pos2_x = width / 2 + 100;
+		pos2_y = height - 80;
+		kierunek[0] = 0;
+		kierunek[1] = 0;
+	}
 	for (int i = 0; i < 5; i++) {
 		fiolka_zniszczona[i] = false;
 	}
@@ -329,6 +346,10 @@ void pre_start_game() {
 	int SZEROKOSC_PRZECIWNIK = al_get_bitmap_width(BMP_PRZECIWNIK);
 	int WYSOKOSC_PRZECIWNIK = al_get_bitmap_height(BMP_PRZECIWNIK);
 	int ostatnia_pozycja_gracz[2] = { pos_x, pos_y };
+	int ostatnia_pozycja_gracz2[2] = { pos2_x, pos2_y };
+	if (wybor_ilosci_graczy[1] == true) {
+		int ostatnia_pozycja_gracz2[2] = { pos2_x, pos2_y };
+	}
 	int ostatnia_pozycja_komputer[MAX_PRZECIWNIKOW][2];
 	int fiolki_x[5] = { width / 2 - 55, width / 2 - 55 , width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1),width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1) * 2 ,width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1) * 2 };
 	int fiolki_y[5] = { height - 70, height - 90 - al_get_bitmap_width(BMP_TEKSTURA1),height - 90 - al_get_bitmap_width(BMP_TEKSTURA1),height - 90 - al_get_bitmap_width(BMP_TEKSTURA1),height - 70 };
@@ -339,6 +360,8 @@ void pre_start_game() {
 		al_wait_for_event(event_queue_stage, &ev);
 		if (tajmer_opoznienie_gracz > 0.0f)
 			tajmer_opoznienie_gracz = tajmer_opoznienie_gracz - (DeltaTime);
+		if (tajmer_opoznienie_gracz2 > 0.0f)
+			tajmer_opoznienie_gracz2 = tajmer_opoznienie_gracz2 - (DeltaTime);
 		for (i = 0; i < MAX_PRZECIWNIKOW; i++)
 			if (tajmer_opoznienie_strzelania[i] > 0.0f)
 				tajmer_opoznienie_strzelania[i] = tajmer_opoznienie_strzelania[i] - (DeltaTime);
@@ -348,27 +371,53 @@ void pre_start_game() {
 		if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
 			switch (ev.keyboard.keycode)
 			{
+				if (wybor_ilosci_graczy[1] == true) {
+			case ALLEGRO_KEY_W:
+				keys1[W] = true;
+				kierunek[1] = 0;
+				break;
+			case ALLEGRO_KEY_S:
+				keys1[S] = true;
+				kierunek[1] = 1;
+				break;
+			case ALLEGRO_KEY_A:
+				keys1[A] = true;
+				kierunek[1] = 2;
+				break;
+			case ALLEGRO_KEY_D:
+				keys1[D] = true;
+				kierunek[1] = 3;
+				break;
+			case ALLEGRO_KEY_CAPSLOCK:
+				keys1[CAPS] = true;
+				if (tajmer_opoznienie_gracz2 <= 0) {
+					temp = add_bullet(pos2_x, pos2_y + 20, kierunek[1], 2);
+					bullets[temp].alive = 1;
+					tajmer_opoznienie_gracz2 = OPOZNIENIE_STRZELANIA;
+				}
+				break;
+			}
 			case ALLEGRO_KEY_UP:
 				keys[UP] = true;
-				kierunek = 0;
+				kierunek[0] = 0;
 				break;
 			case ALLEGRO_KEY_DOWN:
 				keys[DOWN] = true;
-				kierunek = 1;
+				kierunek[0] = 1;
 				break;
 			case ALLEGRO_KEY_LEFT:
 				keys[LEFT] = true;
-				kierunek = 2;
+				kierunek[0] = 2;
 				break;
 
 			case ALLEGRO_KEY_RIGHT:
 				keys[RIGHT] = true;
-				kierunek = 3;
+				kierunek[0] = 3;
 				break;
 			case ALLEGRO_KEY_SPACE:
 				keys[SPACE] = true;
 				if (tajmer_opoznienie_gracz <= 0) {
-					temp = add_bullet(pos_x, pos_y + 20, kierunek, 0);
+					temp = add_bullet(pos_x, pos_y + 20, kierunek[0], 0);
 					bullets[temp].alive = 1;
 					tajmer_opoznienie_gracz = OPOZNIENIE_STRZELANIA;
 				}
@@ -378,6 +427,23 @@ void pre_start_game() {
 		else if (ev.type == ALLEGRO_EVENT_KEY_UP)
 		{
 			switch (ev.keyboard.keycode) {
+				if (wybor_ilosci_graczy[1] == true) {
+			case ALLEGRO_KEY_W:
+				keys1[W] = false;
+				break;
+			case ALLEGRO_KEY_S:
+				keys1[S] = false;
+				break;
+			case ALLEGRO_KEY_A:
+				keys1[A] = false;
+				break;
+			case ALLEGRO_KEY_D:
+				keys1[D] = false;
+				break;
+			case ALLEGRO_KEY_CAPSLOCK:
+				keys1[CAPS] = false;
+				break;
+				}
 			case ALLEGRO_KEY_UP:
 				keys[UP] = false;
 				break;
@@ -423,7 +489,7 @@ void pre_start_game() {
 						random_y[i] = rand() % PREDKOSC_PRZECIWNIKOW;
 					}
 					if (tajmer_opoznienie_strzelania[i] <= 0 && rand() % PRAWODOPOBIENSTWO_STRZALU_PRZECIWNIK == 0) {
-						temp = add_bullet(Przeciwnik[i].x, Przeciwnik[i].y + 20, kierunek, 1);
+						temp = add_bullet(Przeciwnik[i].x, Przeciwnik[i].y + 20, kierunek[0], 1);
 						bullets[temp].alive = 1;
 						tajmer_opoznienie_strzelania[i] = OPOZNIENIE_STRZELANIA_PRZECIWNICY;
 					}
@@ -471,6 +537,12 @@ void pre_start_game() {
 						pos_x = ostatnia_pozycja_gracz[0];
 						pos_y = ostatnia_pozycja_gracz[1];
 					}
+					if (collision(Przeciwnik[i].x, SZEROKOSC_PRZECIWNIK, pos2_x, Przeciwnik[i].y, WYSOKOSC_PRZECIWNIK, pos2_y, WYSOKOSC_LUDEK)) {
+						Przeciwnik[i].x = ostatnia_pozycja_komputer[i][0];
+						Przeciwnik[i].y = ostatnia_pozycja_komputer[i][1];
+						pos2_x = ostatnia_pozycja_gracz2[0];
+						pos2_y = ostatnia_pozycja_gracz2[1];
+					}
 				}
 			}
 			for (i = 0; i < MAX_BULLETS; i++)
@@ -502,9 +574,16 @@ void pre_start_game() {
 					}
 					if (bullets[i].czyj == 1 && collision(bullets[i].x, SZEROKOSC_POCISK, pos_x, bullets[i].y, WYSOKOSC_POCISK, pos_y, WYSOKOSC_LUDEK)) {
 						bullets[i].alive = 0;
-						in_game = false;
+						player_alive[0] = false;
+						pos_x = -100;
+						pos_y = -100;
 					}
-
+					if (bullets[i].czyj == 1 && collision(bullets[i].x, SZEROKOSC_POCISK, pos2_x, bullets[i].y, WYSOKOSC_POCISK, pos2_y, WYSOKOSC_LUDEK)) {
+						bullets[i].alive = 0;
+						player_alive[1] = false;
+						pos2_x = -100;
+						pos2_y = -100;
+					}
 					if (!fiolka_zniszczona[0] && collision(bullets[i].x, SZEROKOSC_POCISK, fiolki_x[0], bullets[i].y, WYSOKOSC_POCISK, fiolki_y[0], WYSOKOSC_FIOLKA)) {
 						bullets[i].alive = 0;
 						BMP_TEKSTURA1 = al_load_bitmap("mapybmp/fiolka_zniszczona.png");
@@ -538,43 +617,99 @@ void pre_start_game() {
 			}
 			ostatnia_pozycja_gracz[0] = pos_x;
 			ostatnia_pozycja_gracz[1] = pos_y;
-			pos_y -= keys[UP] * PREDKOSC_POSTACI;
-			pos_y += keys[DOWN] * PREDKOSC_POSTACI;
-			pos_x -= keys[LEFT] * PREDKOSC_POSTACI;
-			pos_x += keys[RIGHT] * PREDKOSC_POSTACI;
-			if (pos_y <= 0) pos_y = 0;
-			if (pos_x <= 0) pos_x = 0;
-			if (pos_y + WYSOKOSC_LUDEK >= height) pos_y = height - WYSOKOSC_LUDEK;
-			if (pos_x + SZEROKOSC_LUDEK >= width) pos_x = width - SZEROKOSC_LUDEK;
-			if (!fiolka_zniszczona[0] && collision(pos_x, SZEROKOSC_LUDEK, fiolki_x[0], pos_y, WYSOKOSC_LUDEK, fiolki_y[0], WYSOKOSC_FIOLKA)) {
+			ostatnia_pozycja_gracz2[0] = pos2_x;
+			ostatnia_pozycja_gracz2[1] = pos2_y;
+			if (player_alive[0]) {
+				pos_y -= keys[UP] * PREDKOSC_POSTACI;
+				pos_y += keys[DOWN] * PREDKOSC_POSTACI;
+				pos_x -= keys[LEFT] * PREDKOSC_POSTACI;
+				pos_x += keys[RIGHT] * PREDKOSC_POSTACI;
+			}
+			if (wybor_ilosci_graczy[1] == true && player_alive[1]) {
+				pos2_y -= keys1[W] * PREDKOSC_POSTACI;
+				pos2_y += keys1[S] * PREDKOSC_POSTACI;
+				pos2_x -= keys1[A] * PREDKOSC_POSTACI;
+				pos2_x += keys1[D] * PREDKOSC_POSTACI;
+			}
+			if (player_alive[0] && player_alive[1] && collision(pos_x, SZEROKOSC_LUDEK, pos2_x, pos_y, WYSOKOSC_LUDEK, pos2_y, WYSOKOSC_LUDEK)){
 				pos_x = ostatnia_pozycja_gracz[0];
 				pos_y = ostatnia_pozycja_gracz[1];
+				pos2_x = ostatnia_pozycja_gracz2[0];
+				pos2_y = ostatnia_pozycja_gracz2[1];
 			}
-			if (!fiolka_zniszczona[1] && collision(pos_x, SZEROKOSC_LUDEK, fiolki_x[1], pos_y, WYSOKOSC_LUDEK, fiolki_y[1], WYSOKOSC_FIOLKA)) {
-				pos_x = ostatnia_pozycja_gracz[0];
-				pos_y = ostatnia_pozycja_gracz[1];
+			if (player_alive[0]) {
+				if (pos_y <= 0) pos_y = 0;
+				if (pos_x <= 0) pos_x = 0;
+				if (pos_y + WYSOKOSC_LUDEK >= height) pos_y = height - WYSOKOSC_LUDEK;
+				if (pos_x + SZEROKOSC_LUDEK >= width) pos_x = width - SZEROKOSC_LUDEK;
+				if (!fiolka_zniszczona[0] && collision(pos_x, SZEROKOSC_LUDEK, fiolki_x[0], pos_y, WYSOKOSC_LUDEK, fiolki_y[0], WYSOKOSC_FIOLKA)) {
+					pos_x = ostatnia_pozycja_gracz[0];
+					pos_y = ostatnia_pozycja_gracz[1];
+				}
+				if (!fiolka_zniszczona[1] && collision(pos_x, SZEROKOSC_LUDEK, fiolki_x[1], pos_y, WYSOKOSC_LUDEK, fiolki_y[1], WYSOKOSC_FIOLKA)) {
+					pos_x = ostatnia_pozycja_gracz[0];
+					pos_y = ostatnia_pozycja_gracz[1];
+				}
+				if (!fiolka_zniszczona[2] && collision(pos_x, SZEROKOSC_LUDEK, fiolki_x[2], pos_y, WYSOKOSC_LUDEK, fiolki_y[2], WYSOKOSC_FIOLKA)) {
+					pos_x = ostatnia_pozycja_gracz[0];
+					pos_y = ostatnia_pozycja_gracz[1];
+				}
+				if (!fiolka_zniszczona[3] && collision(pos_x, SZEROKOSC_LUDEK, fiolki_x[3], pos_y, WYSOKOSC_LUDEK, fiolki_y[3], WYSOKOSC_FIOLKA)) {
+					pos_x = ostatnia_pozycja_gracz[0];
+					pos_y = ostatnia_pozycja_gracz[1];
+				}
+				if (!fiolka_zniszczona[4] && collision(pos_x, SZEROKOSC_LUDEK, fiolki_x[4], pos_y, WYSOKOSC_LUDEK, fiolki_y[4], WYSOKOSC_FIOLKA)) {
+					pos_x = ostatnia_pozycja_gracz[0];
+					pos_y = ostatnia_pozycja_gracz[1];
+				}
+				if (collision(pos_x, SZEROKOSC_LUDEK, SYMBOL[0], pos_y, WYSOKOSC_LUDEK, SYMBOL[1], WYSOKOSC_SYMBOL)) {
+					pos_x = ostatnia_pozycja_gracz[0];
+					pos_y = ostatnia_pozycja_gracz[1];
+				}
 			}
-			if (!fiolka_zniszczona[2] && collision(pos_x, SZEROKOSC_LUDEK, fiolki_x[2], pos_y, WYSOKOSC_LUDEK, fiolki_y[2], WYSOKOSC_FIOLKA)) {
-				pos_x = ostatnia_pozycja_gracz[0];
-				pos_y = ostatnia_pozycja_gracz[1];
+			if (wybor_ilosci_graczy[1] == true && player_alive[1]) {
+			if (pos2_y <= 0) pos2_y = 0;
+			if (pos2_x <= 0) pos2_x = 0;
+				if (pos2_y + WYSOKOSC_LUDEK >= height) pos2_y = height - WYSOKOSC_LUDEK;
+				if (pos2_x + SZEROKOSC_LUDEK >= width) pos2_x = width - SZEROKOSC_LUDEK;
+				if (!fiolka_zniszczona[0] && collision(pos2_x, SZEROKOSC_LUDEK, fiolki_x[0], pos2_y, WYSOKOSC_LUDEK, fiolki_y[0], WYSOKOSC_FIOLKA)) {
+					pos2_x = ostatnia_pozycja_gracz2[0];
+					pos2_y = ostatnia_pozycja_gracz2[1];
+				}
+				if (!fiolka_zniszczona[1] && collision(pos2_x, SZEROKOSC_LUDEK, fiolki_x[1], pos2_y, WYSOKOSC_LUDEK, fiolki_y[1], WYSOKOSC_FIOLKA)) {
+					pos2_x = ostatnia_pozycja_gracz2[0];
+					pos2_y = ostatnia_pozycja_gracz2[1];
+				}
+				if (!fiolka_zniszczona[2] && collision(pos2_x, SZEROKOSC_LUDEK, fiolki_x[2], pos2_y, WYSOKOSC_LUDEK, fiolki_y[2], WYSOKOSC_FIOLKA)) {
+					pos2_x = ostatnia_pozycja_gracz2[0];
+					pos2_y = ostatnia_pozycja_gracz2[1];
+				}
+				if (!fiolka_zniszczona[3] && collision(pos2_x, SZEROKOSC_LUDEK, fiolki_x[3], pos2_y, WYSOKOSC_LUDEK, fiolki_y[3], WYSOKOSC_FIOLKA)) {
+					pos2_x = ostatnia_pozycja_gracz2[0];
+					pos2_y = ostatnia_pozycja_gracz2[1];
+				}
+				if (!fiolka_zniszczona[4] && collision(pos2_x, SZEROKOSC_LUDEK, fiolki_x[4], pos2_y, WYSOKOSC_LUDEK, fiolki_y[4], WYSOKOSC_FIOLKA)) {
+					pos2_x = ostatnia_pozycja_gracz2[0];
+					pos2_y = ostatnia_pozycja_gracz2[1];
+				}
+				if (collision(pos2_x, SZEROKOSC_LUDEK, SYMBOL[0], pos2_y, WYSOKOSC_LUDEK, SYMBOL[1], WYSOKOSC_SYMBOL)) {
+					pos2_x = ostatnia_pozycja_gracz2[0];
+					pos2_y = ostatnia_pozycja_gracz2[1];
+				}
 			}
-			if (!fiolka_zniszczona[3] && collision(pos_x, SZEROKOSC_LUDEK, fiolki_x[3], pos_y, WYSOKOSC_LUDEK, fiolki_y[3], WYSOKOSC_FIOLKA)) {
-				pos_x = ostatnia_pozycja_gracz[0];
-				pos_y = ostatnia_pozycja_gracz[1];
-			}
-			if (!fiolka_zniszczona[4] && collision(pos_x, SZEROKOSC_LUDEK, fiolki_x[4], pos_y, WYSOKOSC_LUDEK, fiolki_y[4], WYSOKOSC_FIOLKA)) {
-				pos_x = ostatnia_pozycja_gracz[0];
-				pos_y = ostatnia_pozycja_gracz[1];
-			}
-			if (collision(pos_x, SZEROKOSC_LUDEK, SYMBOL[0], pos_y, WYSOKOSC_LUDEK, SYMBOL[1], WYSOKOSC_SYMBOL)) {
-				pos_x = ostatnia_pozycja_gracz[0];
-				pos_y = ostatnia_pozycja_gracz[1];
-			}
-			switch (kierunek) {
+			switch (kierunek[0]) {
 			case 0:al_draw_bitmap(BMP_POSTAC_GORA, pos_x, pos_y, 0); break;
 			case 1:al_draw_bitmap(BMP_POSTAC_DOL, pos_x, pos_y, 0); break;
 			case 2:al_draw_bitmap(BMP_POSTAC_LEWO, pos_x, pos_y, 0); break;
 			case 3: al_draw_bitmap(BMP_POSTAC_PRAWO, pos_x, pos_y, 0); break;
+			}
+			if (wybor_ilosci_graczy[1] == true) {
+				switch (kierunek[1]) {
+				case 0:al_draw_bitmap(BMP_POSTAC_GORA_2, pos2_x, pos2_y, 0); break;
+				case 1:al_draw_bitmap(BMP_POSTAC_DOL_2, pos2_x, pos2_y, 0); break;
+				case 2:al_draw_bitmap(BMP_POSTAC_LEWO_2, pos2_x, pos2_y, 0); break;
+				case 3: al_draw_bitmap(BMP_POSTAC_PRAWO_2, pos2_x, pos2_y, 0); break;
+				}
 			}
 			create_enemy(Przeciwnik);
 			al_flip_display();
@@ -636,6 +771,11 @@ int main(void) {
 	BMP_POSTAC_PRAWO = al_load_bitmap("studentbmp/prawo.png");
 	BMP_POSTAC_LEWO = al_load_bitmap("studentbmp/lewo.png");
 	BMP_POCISK = al_load_bitmap("studentbmp/atak_podstawowy.png");
+	BMP_POSTAC_GORA_2 = al_load_bitmap("studentbmp/polnoc_2.png");
+	BMP_POSTAC_DOL_2 = al_load_bitmap("studentbmp/poludnie_2.png");
+	BMP_POSTAC_PRAWO_2 = al_load_bitmap("studentbmp/prawo_2.png");
+	BMP_POSTAC_LEWO_2 = al_load_bitmap("studentbmp/lewo_2.png");
+	BMP_POCISK_2 = al_load_bitmap("studentbmp/atak_podstawowy2.png");
 	ikona = al_load_bitmap("wejsciowe/ikona.png");
 	al_set_display_icon(display, ikona);
 	al_hide_mouse_cursor(display);
@@ -664,21 +804,18 @@ int main(void) {
 			{
 			case ALLEGRO_KEY_UP:
 				keys[UP] = true;
-				kierunek = 0;
 				if (!zablokowane[0]) if (--menu[0] == -1) menu[0] = 0;
 				if (zablokowane[0]) if (--menu[1] == -1) menu[1] = 0;
 				if (zablokowane[0]) if (--menu[2] == -1) menu[2] = 0;
 				break;
 			case ALLEGRO_KEY_DOWN:
 				keys[DOWN] = true;
-				kierunek = 1;
 				if (!zablokowane[0]) if (++menu[0] == 5) menu[0] = 4;
 				if (zablokowane[0]) if (++menu[1] == 2) menu[1] = 1;
 				if (zablokowane[0]) if (++menu[2] == 2) menu[2] = 1;
 				break;
 			case ALLEGRO_KEY_LEFT:
 				keys[LEFT] = true;
-				kierunek = 2;
 				if (zapamietaj == 2) {
 					if (muzyka_wlaczona) {
 						al_destroy_bitmap(BMP_WEJSCIOWE);
@@ -699,7 +836,6 @@ int main(void) {
 
 			case ALLEGRO_KEY_RIGHT:
 				keys[RIGHT] = true;
-				kierunek = 3;
 				if (zapamietaj == 2) {
 					if (!muzyka_wlaczona) {
 						al_destroy_bitmap(BMP_WEJSCIOWE);
@@ -761,8 +897,8 @@ int main(void) {
 					zapamietaj = 0;
 					if (zliczaj_enter > 1) {
 						switch (menu[1]) {
-						case 0: wybor_ilosci_graczy[0] = true; wybor_ilosci_graczy[1] = false; opuscil_menu = true; in_game = true; al_clear_to_color(al_map_rgb(0, 0, 0));  pre_start_game();  break;
-							//	case 1:  wybor_ilosci_graczy[0] = false; wybor_ilosci_graczy[1] = true; rozpocznij_gre(); break;
+						case 0: wybor_ilosci_graczy[0] = true; wybor_ilosci_graczy[1] = false; opuscil_menu = true; in_game = true; al_clear_to_color(al_map_rgb(0, 0, 0)); pre_start_game();  break;
+						case 1:  wybor_ilosci_graczy[0] = true; wybor_ilosci_graczy[1] = true; opuscil_menu = true; in_game = true; al_clear_to_color(al_map_rgb(0, 0, 0));  pre_start_game(); break;
 						}
 						zliczaj_enter--;
 					}
@@ -834,6 +970,11 @@ int main(void) {
 	al_destroy_bitmap(BMP_POSTAC_LEWO);
 	al_destroy_bitmap(BMP_POSTAC_PRAWO);
 	al_destroy_bitmap(BMP_POSTAC);
+	al_destroy_bitmap(BMP_POSTAC_GORA_2);
+	al_destroy_bitmap(BMP_POSTAC_DOL_2);
+	al_destroy_bitmap(BMP_POSTAC_LEWO_2);
+	al_destroy_bitmap(BMP_POSTAC_PRAWO_2);
+	al_destroy_bitmap(BMP_POSTAC_2);
 	al_destroy_bitmap(BMP_POZIOM);
 	al_destroy_bitmap(BMP_TEKSTURA1);
 	al_destroy_bitmap(BMP_TEKSTURA2);
@@ -842,6 +983,7 @@ int main(void) {
 	al_destroy_bitmap(BMP_TEKSTURA5);
 	al_destroy_bitmap(BMP_SEMESTR_OVER);
 	al_destroy_bitmap(BMP_POCISK);
+	al_destroy_bitmap(BMP_POCISK_2);
 	al_destroy_bitmap(BMP_PRZECIWNIK);
 	al_destroy_event_queue(event_queue);
 }
