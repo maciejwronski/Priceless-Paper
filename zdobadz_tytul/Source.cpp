@@ -349,7 +349,9 @@ void pre_start_game() {
 	int ostatnia_pozycja_gracz2[2] = { pos2_x, pos2_y };
 	if (wybor_ilosci_graczy[1] == true) {
 		int ostatnia_pozycja_gracz2[2] = { pos2_x, pos2_y };
+		player_alive[1] = true;
 	}
+	else player_alive[1] = false;
 	int ostatnia_pozycja_komputer[MAX_PRZECIWNIKOW][2];
 	int fiolki_x[5] = { width / 2 - 55, width / 2 - 55 , width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1),width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1) * 2 ,width / 2 - 55 + al_get_bitmap_width(BMP_TEKSTURA1) * 2 };
 	int fiolki_y[5] = { height - 70, height - 90 - al_get_bitmap_width(BMP_TEKSTURA1),height - 90 - al_get_bitmap_width(BMP_TEKSTURA1),height - 90 - al_get_bitmap_width(BMP_TEKSTURA1),height - 70 };
@@ -390,7 +392,7 @@ void pre_start_game() {
 				break;
 			case ALLEGRO_KEY_CAPSLOCK:
 				keys1[CAPS] = true;
-				if (tajmer_opoznienie_gracz2 <= 0) {
+				if (tajmer_opoznienie_gracz2 <= 0 && player_alive[1]) {
 					temp = add_bullet(pos2_x, pos2_y + 20, kierunek[1], 2);
 					bullets[temp].alive = 1;
 					tajmer_opoznienie_gracz2 = OPOZNIENIE_STRZELANIA;
@@ -416,7 +418,7 @@ void pre_start_game() {
 				break;
 			case ALLEGRO_KEY_SPACE:
 				keys[SPACE] = true;
-				if (tajmer_opoznienie_gracz <= 0) {
+				if (tajmer_opoznienie_gracz <= 0 && player_alive[0]) {
 					temp = add_bullet(pos_x, pos_y + 20, kierunek[0], 0);
 					bullets[temp].alive = 1;
 					tajmer_opoznienie_gracz = OPOZNIENIE_STRZELANIA;
@@ -897,7 +899,7 @@ int main(void) {
 					zapamietaj = 0;
 					if (zliczaj_enter > 1) {
 						switch (menu[1]) {
-						case 0: wybor_ilosci_graczy[0] = true; wybor_ilosci_graczy[1] = false; opuscil_menu = true; in_game = true; al_clear_to_color(al_map_rgb(0, 0, 0)); pre_start_game();  break;
+						case 0: wybor_ilosci_graczy[0] = true; wybor_ilosci_graczy[1] = false; opuscil_menu = true; in_game = true; al_clear_to_color(al_map_rgb(0, 0, 0)); pre_start_game(); break;
 						case 1:  wybor_ilosci_graczy[0] = true; wybor_ilosci_graczy[1] = true; opuscil_menu = true; in_game = true; al_clear_to_color(al_map_rgb(0, 0, 0));  pre_start_game(); break;
 						}
 						zliczaj_enter--;
