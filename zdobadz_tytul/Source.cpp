@@ -17,11 +17,12 @@
 #define OPOZNIENIE_STRZELANIA 0.6f
 #define MAX_BULLETS 100 // maksymalna ilosc pociskow na mapie
 #define MAX_PRZECIWNIKOW 10
+#define MAX_PRZECIWNIKOW_JEDNOCZESNIE 4
 #define PREDKOSC_POSTACI 5
 #define PRZECIWNICY_KIERUNEK 0.4f
 #define OPOZNIENIE_STRZELANIA_PRZECIWNICY 0.5f
 #define PRAWODOPOBIENSTWO_STRZALU_PRZECIWNIK 400
-#define PRAWDOPODOBIENSTWO_RESPAWN_PRZECIWNIK 100
+#define PRAWDOPODOBIENSTWO_RESPAWN_PRZECIWNIK 1000
 #define PRAWDOPODOBIENSTWO_RESPAWN_BOSS 10
 
 //////////////// BONUSY /////////////////////
@@ -56,6 +57,7 @@ int kierunek[2] = { -1 };
 float DeltaTime = 1.0 / FPS;
 int poziom = 1;
 int enemies_killed = 0;
+int enemies_count = 0;
 bool fiolka_zniszczona[5] = { false, false, false, false, false };
 float tajmer_opoznienie_gracz = -1.0f;
 float tajmer_opoznienie_gracz2 = -1.0f;
@@ -169,10 +171,11 @@ bool collision(int pos_x1, int width_x1, int pos_x2, int pos_y1, int height_y1, 
 }
 void create_enemy(przeciwnik Przeciwnik[]) {
 	for (int i = 0; i < MAX_PRZECIWNIKOW; i++) {
-		if (!Przeciwnik[i].alive && Przeciwnik[i].died != 1) {
+		if ((enemies_count < MAX_PRZECIWNIKOW_JEDNOCZESNIE) && !Przeciwnik[i].alive && Przeciwnik[i].died != 1) {
 			if (rand() % PRAWDOPODOBIENSTWO_RESPAWN_PRZECIWNIK == 0) {
 				Przeciwnik[i].alive = 1;
 				Przeciwnik[i].lifes = 1;
+				enemies_count++;
 				Przeciwnik[i].x = (rand() % width) + 30;
 				Przeciwnik[i].y = (rand() % height - 60) + 50;
 				for (int t = 0; t <12; t++) {
@@ -603,6 +606,7 @@ void pre_start_game() {
 								Przeciwnik[j].alive = 0;
 								Przeciwnik[j].died = 1;
 								enemies_killed++;
+								enemies_count--;
 							}
 							if (enemies_killed == MAX_PRZECIWNIKOW) {
 								al_draw_bitmap(BMP_WEJSCIOWE, 0, 0, 0);
