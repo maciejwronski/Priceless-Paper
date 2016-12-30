@@ -8,32 +8,35 @@
 #include <allegro5\allegro_acodec.h>
 #include <allegro5\monitor.h>
 #include <ctime>
+#include <math.h>
 
-
-	/////////////////////////////// CONFIGURATION ////////////////////////////////
+/////////////////////////////// CONFIGURATION ////////////////////////////////
 #define FPS 60
 #define SPEED_OF_BULLETS 6
 #define SPEED_OF_ENEMIES 5
 #define COOLDOWN_ON_SHOTS 0.6f
 #define MAX_BULLETS 100 // MAX NUMBER OF BULLETS AT THE MAP
 #define MAX_NUMBER_OF_ENEMIES 10
-#define MAX_NUMBER_OF_ENEMIES_AT_THE_SAME_TIME MAX_NUMBER_OF_ENEMIES
+#define MAX_NUMBER_OF_ENEMIES_AT_THE_SAME_TIME 4
 #define SPEED_OF_PLAYER 5
 #define COOLDOWN_ON_ENEMIES_DIRECTION 0.4f
 #define COOLDOWN_ON_ENEMIES_SHOTS 0.5f
 #define PROBABILITY_THAT_ENEMY_SHOOTS 400
-#define PROBABILITY_THAT_ENEMY_RESPAWNS 1
-#define PROBABILITY_THAT_BOSS_RESPAWNS 10
-
-
-//////////////// BONUSES /////////////////////
-#define CZAS_NIESMIERTELNOSCI 5
-
+#define PROBABILITY_THAT_ENEMY_RESPAWNS 100
+#define PROBABILITY_THAT_BOSS_RESPAWNS 1
+#define POINTS_FOR_ENEMY 100
+#define POINTS_FOR_BOSS 200
+#define SIZE_FONT 30
+#define MAX_BONUS 10
+///////////////////////////////////////////////
+//////////////// BONUSES //////////////////////
+#define TIME_OF_BEEING_UNDEAD 5
+///////////////////////////////////////////////
 ////////////////OBIECTS ON MAP////////////////
 // 0 - NOTHING
 // 1 - FLASK
+//////////////////////////////////////////////
 ////////////////////////////////// CONFIGURATION ////////////////////////////////
-
 ////////////VARIABLES//////////////
 bool left = false;
 bool is_back = true;
@@ -56,6 +59,7 @@ float DeltaTime = 1.0 / FPS;
 int stage = 1;
 int enemies_killed = 0;
 int enemies_count = 0;
+int global_score = 0;
 // cooldowns for players shoots, 0 - player1, 1 - player2
 float player_timer_cooldown[2] = { -1.0f };
 // cooldowns for enemy's, 0 - movement, 1 - shoot
@@ -112,9 +116,16 @@ ALLEGRO_BITMAP *BMP_SEMESTER_OVER = NULL;
 ALLEGRO_BITMAP *BMP_ENEMY = NULL;
 ALLEGRO_BITMAP *BMP_ENEMY_BOSS = NULL;
 ALLEGRO_BITMAP *BMP_BULLET_ENEMY = NULL;
+////// BONUS_BITMAPS
+ALLEGRO_BITMAP *BMP_FREEZE = NULL;
+ALLEGRO_BITMAP *BMP_UNDEAD = NULL;
+ALLEGRO_BITMAP *BMP_DESTROY = NULL;
+ALLEGRO_BITMAP *BMP_LIFE = NULL;
+ALLEGRO_BITMAP *BMP_RENOVATION = NULL;
+
 // music sample //
 ALLEGRO_SAMPLE *sample = NULL;
-//
+// font
 
 int width, height;
 
@@ -122,13 +133,13 @@ typedef struct obiekt {
 	int x;
 	int y;
 	int alive;
-	int kierunek;
-	int czyj;
+	int direction;
+	int whose;
 } obiekt;
 
 obiekt bullets[MAX_BULLETS];
 
-int add_bullet(int x, int y, int kierunek, int czyj_pocisk) // 0 - gracz 1 - komputer
+int add_bullet(int x, int y, int kierunek, int whose_bullet) // 0 - gracz 1 - komputer
 {
 	int i;
 
@@ -136,8 +147,8 @@ int add_bullet(int x, int y, int kierunek, int czyj_pocisk) // 0 - gracz 1 - kom
 		if (bullets[i].alive == 0) {
 			bullets[i].x = x;
 			bullets[i].y = y;
-			bullets[i].kierunek = kierunek;
-			bullets[i].czyj = czyj_pocisk;
+			bullets[i].direction = kierunek;
+			bullets[i].whose = whose_bullet;
 			return i;
 		}
 	}
@@ -152,7 +163,69 @@ typedef struct przeciwnik {
 	int lifes;
 	int died;
 	int boss;
+	int points;
 } przeciwnik;
+
+typedef struct bonus {
+	int x;
+	int y;
+	int alive;
+	float time = 5.0;
+	int type;
+	int width;
+	int height;
+}bonus;
+bonus Bonus[MAX_BONUS];
+
+int create_bonus(bonus Bonus[], int x, int y) {
+	for (int i = 0; i < MAX_BONUS; i++) {
+		if (Bonus[i].alive == 0) {
+			Bonus[i].alive = 1;
+			Bonus[i].x = x;
+			Bonus[i].y = y;
+			Bonus[i].type = rand()%5;
+			if (Bonus[i].type == 0) {
+				Bonus[i].width = al_get_bitmap_width(BMP_UNDEAD);
+				Bonus[i].height = al_get_bitmap_height(BMP_UNDEAD);
+			}
+			else if (Bonus[i].type == 1) {
+				Bonus[i].width = al_get_bitmap_width(BMP_DESTROY);
+				Bonus[i].height = al_get_bitmap_height(BMP_DESTROY);
+			}
+			else if (Bonus[i].type == 2) {
+				Bonus[i].width = al_get_bitmap_width(BMP_FREEZE);
+				Bonus[i].height = al_get_bitmap_height(BMP_FREEZE);
+			}
+			else if (Bonus[i].type == 3) {
+				Bonus[i].width = al_get_bitmap_width(BMP_LIFE);
+				Bonus[i].height = al_get_bitmap_height(BMP_LIFE);
+			}
+			else if (Bonus[i].type == 4){
+				Bonus[i].width = al_get_bitmap_width(BMP_RENOVATION);
+				Bonus[i].height = al_get_bitmap_height(BMP_RENOVATION);
+
+			}
+			return i;
+		}
+	}
+	return(0);
+}
+void draw_bonus(bonus Bonus[]) {
+	for (int i = 0; i < MAX_BONUS; i++) {
+		if (Bonus[i].alive == 1) {
+			if (Bonus[i].type == 0)
+				al_draw_bitmap(BMP_UNDEAD, Bonus[i].x, Bonus[i].y, 0);
+			else if (Bonus[i].type == 1)
+				al_draw_bitmap(BMP_DESTROY, Bonus[i].x, Bonus[i].y, 0);
+			else if (Bonus[i].type == 2)
+				al_draw_bitmap(BMP_FREEZE, Bonus[i].x, Bonus[i].y, 0);
+			else if (Bonus[i].type == 3)
+				al_draw_bitmap(BMP_LIFE, Bonus[i].x, Bonus[i].y, 0);
+			else if (Bonus[i].type == 4)
+				al_draw_bitmap(BMP_RENOVATION, Bonus[i].x, Bonus[i].y, 0);
+		}
+	}
+}
 bool collision(int pos_x1, int width_x1, int pos_x2, int pos_y1, int height_y1, int pos_y2, int height_y2) {
 	if (pos_x1 + width_x1 >= pos_x2 && pos_x1 <= pos_x2 + width_x1 && pos_y1 + height_y1 >= pos_y2 && pos_y1 <= pos_y2 + height_y2)
 		return true;
@@ -164,6 +237,7 @@ void create_enemy(przeciwnik Przeciwnik[]) {
 			if (rand() % PROBABILITY_THAT_ENEMY_RESPAWNS == 0) {
 				Przeciwnik[i].alive = 1;
 				Przeciwnik[i].lifes = 1;
+				Przeciwnik[i].points = POINTS_FOR_ENEMY;
 				enemies_count++;
 				Przeciwnik[i].x = (rand() % width) + 30;
 				Przeciwnik[i].y = (rand() % height - 60) + 50;
@@ -181,6 +255,7 @@ void create_enemy(przeciwnik Przeciwnik[]) {
 				if (rand() % PROBABILITY_THAT_BOSS_RESPAWNS == 0) {
 					Przeciwnik[i].boss = 1;
 					Przeciwnik[i].lifes = 2;
+					Przeciwnik[i].points = POINTS_FOR_BOSS;
 				}
 			}
 		}
@@ -192,13 +267,13 @@ void draw_bullets(obiekt bullets[]) {
 	for (i = 0; i < MAX_BULLETS; i++) {
 		if (bullets[i].alive == 1)
 		{
-			if (bullets[i].czyj == 0)
+			if (bullets[i].whose == 0)
 				al_draw_bitmap(BMP_BULLET, bullets[i].x, bullets[i].y, 0);
-			if (bullets[i].czyj == 1)
+			if (bullets[i].whose == 1)
 				al_draw_bitmap(BMP_BULLET_ENEMY, bullets[i].x, bullets[i].y, 0);
-			if (bullets[i].czyj == 2)
+			if (bullets[i].whose == 2)
 				al_draw_bitmap(BMP_BULLET_2, bullets[i].x, bullets[i].y, 0);
-			switch (bullets[i].kierunek) {
+			switch (bullets[i].direction) {
 			case 0: bullets[i].y -= SPEED_OF_BULLETS; break;
 			case 1: bullets[i].y += SPEED_OF_BULLETS; break;
 			case 2: bullets[i].x -= SPEED_OF_BULLETS; break;
@@ -219,10 +294,7 @@ void draw_enemies(przeciwnik Przeciwnik[]) {
 }
 przeciwnik Przeciwnik[MAX_NUMBER_OF_ENEMIES];
 
-
-
-
-void rysuj_poziom(int ktory) {
+void draw_stage(int ktory) {
 	switch (ktory) {
 	case 1: {
 		BMP_START = al_load_bitmap("mapybmp/pierwsza.png");
@@ -240,8 +312,9 @@ void rysuj_poziom(int ktory) {
 		BMP_TEXTURE_1 = al_load_bitmap("mapybmp/fiolka.png");
 		BMP_SYMBOL = al_load_bitmap("mapybmp/II.png");
 		BMP_ENEMY = al_load_bitmap("przeciwnicy/calka.png");
-		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/2_semestr_koniec.png");
+		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
 		al_flip_display();
 		break;
 	}
@@ -250,8 +323,9 @@ void rysuj_poziom(int ktory) {
 		BMP_TEXTURE_1 = al_load_bitmap("mapybmp/fiolka.png");
 		BMP_SYMBOL = al_load_bitmap("mapybmp/II.png");
 		BMP_ENEMY = al_load_bitmap("przeciwnicy/calka.png");
-		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/3_semestr_koniec.png");
+		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
 		al_flip_display();
 		break;
 	}
@@ -260,7 +334,8 @@ void rysuj_poziom(int ktory) {
 		BMP_TEXTURE_1 = al_load_bitmap("mapybmp/fiolka.png");
 		BMP_SYMBOL = al_load_bitmap("mapybmp/II.png");
 		BMP_ENEMY= al_load_bitmap("przeciwnicy/calka.png");
-		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
+		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/4_semestr_koniec.png");
 		al_flip_display();
 		break;
@@ -270,7 +345,8 @@ void rysuj_poziom(int ktory) {
 		BMP_TEXTURE_1 = al_load_bitmap("mapybmp/fiolka.png");
 		BMP_SYMBOL = al_load_bitmap("mapybmp/II.png");
 		BMP_ENEMY = al_load_bitmap("przeciwnicy/calka.png");
-		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
+		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/5_semestr_koniec.png");
 		al_flip_display();
 		break;
@@ -280,7 +356,8 @@ void rysuj_poziom(int ktory) {
 		BMP_TEXTURE_1 = al_load_bitmap("mapybmp/fiolka.png");
 		BMP_SYMBOL = al_load_bitmap("mapybmp/II.png");
 		BMP_ENEMY = al_load_bitmap("przeciwnicy/calka.png");
-		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
+		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/6_semestr_koniec.png");
 		al_flip_display();
 		break;
@@ -290,7 +367,7 @@ void rysuj_poziom(int ktory) {
 		BMP_TEXTURE_1 = al_load_bitmap("mapybmp/fiolka.png");
 		BMP_SYMBOL = al_load_bitmap("mapybmp/II.png");
 		BMP_ENEMY = al_load_bitmap("przeciwnicy/calka.png");
-		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
 		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/6_semestr_koniec.png");
 		al_flip_display();
@@ -315,25 +392,29 @@ void clean_everything() {
 		for (int i = 0; i < MAX_NUMBER_OF_ENEMIES; i++)
 			enemy_timer_cooldown[j][i] = -1.0f;
 
-	for (int i = 0; i < MAX_NUMBER_OF_ENEMIES; i++)
+	for (int i = 0; i < MAX_NUMBER_OF_ENEMIES; i++) {
 		Przeciwnik[i].died = 0;
+		Przeciwnik[i].alive = 0;
+		Przeciwnik[i].boss = 0;
+	}
 
 	for(int j = 0; j < MAX_BULLETS; j++)
 		bullets[j].alive = 0;
-
+	for (int i = 0; i < MAX_BONUS; i++)
+		Bonus[i].alive = 0;
 	al_flip_display();
 }
 void pre_start_game() {
 	ALLEGRO_EVENT_QUEUE *event_queue_stage = NULL;
 	ALLEGRO_TIMER *timer_stage = NULL;
-	srand(time(NULL));
+	ALLEGRO_FONT *FONT_SCORE = al_load_font("fonts/georgia.ttf", SIZE_FONT, 0);
 	int i, temp;
 	event_queue_stage = al_create_event_queue();
 	timer_stage = al_create_timer(DeltaTime);
 	al_start_timer(timer_stage);
 	al_register_event_source(event_queue_stage, al_get_keyboard_event_source());
 	al_register_event_source(event_queue_stage, al_get_timer_event_source(timer_stage));
-	rysuj_poziom(1);
+	draw_stage(1);
 	int width_bullet = al_get_bitmap_width(BMP_BULLET);
 	int width_flask = al_get_bitmap_width(BMP_TEXTURE_1);
 	int height_bullet = al_get_bitmap_height(BMP_BULLET);
@@ -349,6 +430,7 @@ void pre_start_game() {
 		player_alive[1] = true;
 	}
 	else player_alive[1] = false;
+	int pos_score_x = ceil(width * 2 / 3);
 	int last_pos_comp[MAX_NUMBER_OF_ENEMIES][2];
 	int SYMBOL[2] = { width / 2, height - 65 };
 	clean_everything();
@@ -464,9 +546,6 @@ void pre_start_game() {
 		else if (ev.type == ALLEGRO_EVENT_TIMER) {
 			al_draw_bitmap(BMP_START, 0, 0, 0);
 			al_draw_bitmap(BMP_SYMBOL, SYMBOL[0], SYMBOL[1], 0);
-			draw_bullets(bullets);
-			draw_enemies(Przeciwnik);
-
 			for (i = 0; i < MAX_NUMBER_OF_ENEMIES; i++)
 			{
 				if (Przeciwnik[i].alive)
@@ -525,6 +604,7 @@ void pre_start_game() {
 					}
 				}
 			}
+
 			for (i = 0; i < MAX_BULLETS; i++)
 			{
 				if (bullets[i].alive)
@@ -532,9 +612,16 @@ void pre_start_game() {
 					if (bullets[i].x < 0 || bullets[i].y < 0 || bullets[i].x > width || bullets[i].y > height)
 						bullets[i].alive = 0;
 					for (int j = 0; j <MAX_NUMBER_OF_ENEMIES; j++) {
-						if (bullets[i].czyj != 1 && Przeciwnik[j].died == 0 && Przeciwnik[j].alive && collision(bullets[i].x, width_bullet, Przeciwnik[j].x, bullets[i].y, height_bullet, Przeciwnik[j].y, height_enemy)) {
+						if (bullets[i].whose != 1 && Przeciwnik[j].died == 0 && Przeciwnik[j].alive && collision(bullets[i].x, width_bullet, Przeciwnik[j].x, bullets[i].y, height_bullet, Przeciwnik[j].y, height_enemy)) {
 							bullets[i].alive = 0;
 							if (--Przeciwnik[j].lifes == 0) {
+								if (Przeciwnik[j].boss) {
+									Przeciwnik[j].boss = 0;
+									global_score += POINTS_FOR_BOSS;
+									temp = create_bonus(Bonus, Przeciwnik[j].x, Przeciwnik[j].y);
+									Bonus[temp].alive = 1;
+								}
+								else global_score += POINTS_FOR_ENEMY;
 								Przeciwnik[j].alive = 0;
 								Przeciwnik[j].died = 1;
 								enemies_killed++;
@@ -549,17 +636,17 @@ void pre_start_game() {
 								enemies_killed = 0;
 								al_rest(10.0);
 								al_start_timer(timer_stage);
-								rysuj_poziom(++stage);
+								draw_stage(++stage);
 							}
 						}
 					}
-					if (bullets[i].czyj == 1 && collision(bullets[i].x, width_bullet, pos_player[0][0], bullets[i].y, height_bullet, pos_player[0][1], height_character)) {
+					if (bullets[i].whose == 1 && collision(bullets[i].x, width_bullet, pos_player[0][0], bullets[i].y, height_bullet, pos_player[0][1], height_character)) {
 						bullets[i].alive = 0;
 						player_alive[0] = false;
 						pos_player[0][0] = -100;
 						pos_player[0][1] = -100;
 					}
-					if (bullets[i].czyj == 1 && collision(bullets[i].x, width_bullet, pos_player[1][0], bullets[i].y, height_bullet, pos_player[1][1], height_character)) {
+					if (bullets[i].whose == 1 && collision(bullets[i].x, width_bullet, pos_player[1][0], bullets[i].y, height_bullet, pos_player[1][1], height_character)) {
 						bullets[i].alive = 0;
 						player_alive[1] = false;
 						pos_player[1][0] = -100;
@@ -602,9 +689,9 @@ void pre_start_game() {
 				pos_player[1][1] = last_pos_player[1][1];
 			}
 			if (player_alive[0]) {
-				for (int t = 0; t <13; t++) {
-					for (int i = 0; i < 28 ; i++) {
-						if (objMap[t][i] == 1 && collision(pos_player[0][0], width_character, i*48, pos_player[0][1], height_character, t*70, height_flask)) {
+				for (int t = 0; t < 13; t++) {
+					for (int i = 0; i < 28; i++) {
+						if (objMap[t][i] == 1 && collision(pos_player[0][0], width_character, i * 48, pos_player[0][1], height_character, t * 70, height_flask)) {
 							pos_player[0][0] = last_pos_player[0][0];
 							pos_player[0][1] = last_pos_player[0][1];
 						}
@@ -618,6 +705,37 @@ void pre_start_game() {
 					pos_player[0][0] = last_pos_player[0][0];
 					pos_player[0][1] = last_pos_player[0][1];
 				}
+				for (int i = 0; i < MAX_BONUS; i++) {
+					if (Bonus[i].alive && collision(pos_player[0][0], width_character, Bonus[i].x, pos_player[0][1], height_character, Bonus[i].y, Bonus[i].height)) {
+						switch (Bonus[i].type) {
+						case 1: {
+							for (int j = 0; j < MAX_NUMBER_OF_ENEMIES; j++) {
+								if (Przeciwnik[j].alive == 1 && Przeciwnik[j].died == 0) {
+									Przeciwnik[j].alive = 0;
+									Przeciwnik[j].died = 1;
+									Przeciwnik[j].lifes = 0;
+									Przeciwnik[j].boss = 0;
+									Bonus[i].alive = 0;
+									enemies_killed++;
+									enemies_count--;
+								}
+							}
+							break;
+						}
+								if (enemies_killed == MAX_NUMBER_OF_ENEMIES) {
+									al_draw_bitmap(BMP_START, 0, 0, 0);
+									al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
+									al_flip_display();
+									al_stop_timer(timer_stage);
+									clean_everything();
+									enemies_killed = 0;
+									al_rest(10.0);
+									al_start_timer(timer_stage);
+									draw_stage(++stage);
+								}
+						}
+					}
+				}
 			}
 			if (number_of_players[1] == true && player_alive[1]) {
 				for (int t = 0; t <13; t++) {
@@ -628,6 +746,7 @@ void pre_start_game() {
 						}
 					}
 				}
+
 			if (pos_player[1][1] <= 0) pos_player[1][1] = 0;
 			if (pos_player[1][0] <= 0) pos_player[1][0] = 0;
 				if (pos_player[1][1] + height_character >= height) pos_player[1][1] = height - height_character;
@@ -637,6 +756,7 @@ void pre_start_game() {
 					pos_player[1][1] = last_pos_player[1][1];
 				}
 			}
+
 			switch (direction[0]) {
 			case 0:al_draw_bitmap(BMP_CHARACTER_UP, pos_player[0][0], pos_player[0][1], 0); break;
 			case 1:al_draw_bitmap(BMP_CHARACTER_DOWN, pos_player[0][0], pos_player[0][1], 0); break;
@@ -651,14 +771,16 @@ void pre_start_game() {
 				case 3: al_draw_bitmap(BMP_CHARACTER_RIGHT_2, pos_player[1][0], pos_player[1][1], 0); break;
 				}
 			}
+			draw_bullets(bullets);
+			draw_enemies(Przeciwnik);
+			draw_bonus(Bonus);
+			al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), pos_score_x, 0, 0, "Wynik: %d", global_score);
 			create_enemy(Przeciwnik);
 			for (int t = 0; t < 13; t++) {
-
 				for (int i = 0; i < 28; i++) {
 					if (objMap[t][i] == 1)
 						al_draw_bitmap(BMP_TEXTURE_1, i*48, t*70, 0);
 				}
-
 			}
 			al_flip_display();
 		}
@@ -723,6 +845,12 @@ int main(void) {
 	BMP_CHARACTER_RIGHT_2 = al_load_bitmap("studentbmp/prawo_2.png");
 	BMP_CHARACTER_LEFT_2 = al_load_bitmap("studentbmp/lewo_2.png");
 	BMP_BULLET_2 = al_load_bitmap("studentbmp/atak_podstawowy2.png");
+	BMP_FREEZE = al_load_bitmap("bonusybmp/freeze.png");
+	BMP_UNDEAD = al_load_bitmap("bonusybmp/niesmiertelnosc.png");
+	BMP_DESTROY = al_load_bitmap("bonusybmp/zniszcz.png");
+	BMP_LIFE = al_load_bitmap("bonusybmp/zycie.png");
+	BMP_RENOVATION = al_load_bitmap("bonusybmp/odnowa.png");
+	ALLEGRO_FONT *FONT_SCORE = al_load_font("fonts/georgia.ttf", 24, 0);
 	icon = al_load_bitmap("wejsciowe/ikona.png");
 	al_set_display_icon(display, icon);
 	al_hide_mouse_cursor(display);
@@ -743,6 +871,7 @@ int main(void) {
 	al_flip_display();
 	al_stop_samples();
 	//al_play_sample(sample, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
+	srand(time(NULL));
 	while (!left && !left_menu) {
 		ALLEGRO_EVENT ev;
 		al_wait_for_event(event_queue, &ev);
@@ -933,5 +1062,11 @@ int main(void) {
 	al_destroy_bitmap(BMP_BULLET_ENEMY);
 	al_destroy_bitmap(BMP_SYMBOL);
 	al_destroy_bitmap(icon);
+	al_destroy_bitmap(BMP_FREEZE);
+	al_destroy_bitmap(BMP_UNDEAD);
+	al_destroy_bitmap(BMP_LIFE);
+	al_destroy_bitmap(BMP_RENOVATION);
+	al_destroy_bitmap(BMP_DESTROY);
 	al_destroy_event_queue(event_queue);
+	al_destroy_timer(timer);
 }
