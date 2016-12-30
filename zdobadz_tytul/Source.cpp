@@ -1,3 +1,5 @@
+//////////////////////////////////// Maciej Wronski, Politechnika Gdanska ////////////////////////////////////////////
+
 #include<allegro5\allegro.h>
 #include<allegro5\allegro_native_dialog.h>
 #include<allegro5\allegro_font.h>
@@ -31,6 +33,7 @@
 ///////////////////////////////////////////////
 //////////////// BONUSES //////////////////////
 #define TIME_OF_BEEING_UNDEAD 5
+#define FREEZE_ON_ENEMIES 4
 ///////////////////////////////////////////////
 ////////////////OBIECTS ON MAP////////////////
 // 0 - NOTHING
@@ -50,24 +53,29 @@ bool music_on = true;
 bool last_music_option = true;
 bool left_menu = false;
 bool in_game = false;
+bool frozen = false;
+bool immunity[2] = { false, false };
 bool number_of_players[2] = { false, false };
 int count_enter_choice = 0;
 int pos_player[2][2] = { 0 };
 int player_alive[2] = { true, true };
+int player_lifes[2] = { 1,1 };
 int direction[2] = { -1 };
 float DeltaTime = 1.0 / FPS;
 int stage = 1;
 int enemies_killed = 0;
 int enemies_count = 0;
 int global_score = 0;
-// cooldowns for players shoots, 0 - player1, 1 - player2
-float player_timer_cooldown[2] = { -1.0f };
+// cooldowns for players shoots, 0 - player1, 1 - player2, 2 - immunity_player1, 3 - immunity_player 2
+float player_timer_cooldown[4] = { -1.0f };
 // cooldowns for enemy's, 0 - movement, 1 - shoot
 float enemy_timer_cooldown[2][MAX_NUMBER_OF_ENEMIES] = { -1.0f };
+float freeze_time = -1.0f;
+float immunity_time[2] = { -1.0f, -1.0f };
 enum KEYS { UP, DOWN, LEFT, RIGHT, SPACE };
 enum KEYS1 { W, S, A, D, CAPS };
 
-int objMap[12][28] =
+int objMap[11][28] =
 {{0,1,1,1,1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 { 0,1,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
 { 0,1,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,0,0},
@@ -241,7 +249,7 @@ void create_enemy(przeciwnik Przeciwnik[]) {
 				enemies_count++;
 				Przeciwnik[i].x = (rand() % width) + 30;
 				Przeciwnik[i].y = (rand() % height - 60) + 50;
-				for (int t = 0; t <13; t++) {
+				for (int t = 0; t <11; t++) {
 					for (int z = 0; z < 28; z++) {
 						if (objMap[t][z] != 0 && collision(Przeciwnik[i].x, al_get_bitmap_width(BMP_ENEMY), z * 48, Przeciwnik[i].y, al_get_bitmap_height(BMP_ENEMY), t * 70, al_get_bitmap_width(BMP_TEXTURE_1))) {
 							Przeciwnik[i].x = (rand() % width) + 30;
@@ -441,6 +449,18 @@ void pre_start_game() {
 			player_timer_cooldown[0] = player_timer_cooldown[0] - (DeltaTime);
 		if (player_timer_cooldown[1] > 0.0f)
 			player_timer_cooldown[1] = player_timer_cooldown[1] - (DeltaTime);
+		if (freeze_time > 0.0f)
+			freeze_time = freeze_time - (DeltaTime);
+		if (freeze_time < 0.0f)
+			frozen = false;
+		if (player_timer_cooldown[2] > 0.0f)
+			player_timer_cooldown[2] = player_timer_cooldown[2] - (DeltaTime);
+		if (player_timer_cooldown[2] < 0.0f)
+			immunity[0] = false;
+		if (player_timer_cooldown[3] > 0.0f)
+			player_timer_cooldown[3] = player_timer_cooldown[3] - (DeltaTime);
+		if (player_timer_cooldown[3] < 0.0f)
+			immunity[1] = false;
 		for (i = 0; i < MAX_NUMBER_OF_ENEMIES; i++)
 			if (enemy_timer_cooldown[1][i] > 0.0f)
 				enemy_timer_cooldown[1][i] = enemy_timer_cooldown[1][i] - (DeltaTime);
@@ -546,113 +566,125 @@ void pre_start_game() {
 		else if (ev.type == ALLEGRO_EVENT_TIMER) {
 			al_draw_bitmap(BMP_START, 0, 0, 0);
 			al_draw_bitmap(BMP_SYMBOL, SYMBOL[0], SYMBOL[1], 0);
-			for (i = 0; i < MAX_NUMBER_OF_ENEMIES; i++)
-			{
-				if (Przeciwnik[i].alive)
-				{
-					int random_x[MAX_NUMBER_OF_ENEMIES];
-					int random_y[MAX_NUMBER_OF_ENEMIES];
-					int losowa[MAX_NUMBER_OF_ENEMIES];
-					if (enemy_timer_cooldown[0][i] <= 0) {
-						losowa[i] = rand() % 4;
-						enemy_timer_cooldown[0][i] = COOLDOWN_ON_ENEMIES_DIRECTION;
-						random_x[i] = rand() % SPEED_OF_ENEMIES;
-						random_y[i] = rand() % SPEED_OF_ENEMIES;
-					}
-					if (enemy_timer_cooldown[1][i] <= 0 && rand() % PROBABILITY_THAT_ENEMY_SHOOTS == 0) {
-						temp = add_bullet(Przeciwnik[i].x, Przeciwnik[i].y + 20, direction[0], 1);
-						bullets[temp].alive = 1;
-						enemy_timer_cooldown[1][i] = COOLDOWN_ON_ENEMIES_SHOTS;
-					}
-					last_pos_comp[i][0] = Przeciwnik[i].x;
-					last_pos_comp[i][1] = Przeciwnik[i].y;
-					switch (losowa[i]) {
-					case 0: Przeciwnik[i].x += random_x[i]; break;
-					case 1: Przeciwnik[i].y += random_y[i]; break;
-					case 2: Przeciwnik[i].x -= random_x[i]; break;
-					case 3:Przeciwnik[i].y -= random_y[i]; break;
-					}
-					for (int t = 0; t <13; t++) {
-						for (int z = 0; z < 28; z++) {
-							if (objMap[t][z] == 1 && collision(Przeciwnik[i].x, width_enemy, z * 48, Przeciwnik[i].y, height_enemy, t * 70, height_flask)) {
-								Przeciwnik[i].x = last_pos_comp[i][0];
-								Przeciwnik[i].y = last_pos_comp[i][1];
-							}
-						}
-					}
-					if (Przeciwnik[i].x < 0) { Przeciwnik[i].x = 0; enemy_timer_cooldown[0][i] = -1.0f; }
-					if (Przeciwnik[i].y < 0) { Przeciwnik[i].y = 0; enemy_timer_cooldown[0][i] = -1.0f; }
-					if (Przeciwnik[i].y + height_enemy >= height) { Przeciwnik[i].y = height - height_enemy;  enemy_timer_cooldown[0][i] = -1.0f; }
-					if (Przeciwnik[i].x + width_enemy >= width) {
-						Przeciwnik[i].x = width - width_enemy; enemy_timer_cooldown[0][i] = -1.0f;
-					}
-					if (collision(Przeciwnik[i].x, width_enemy, SYMBOL[0], Przeciwnik[i].y, height_enemy, SYMBOL[1], height_symbol)) {
-						Przeciwnik[i].x = last_pos_comp[i][0];
-						Przeciwnik[i].y = last_pos_comp[i][1];
-					}
-					if (collision(Przeciwnik[i].x, width_enemy, pos_player[0][0], Przeciwnik[i].y, height_enemy, pos_player[0][1], height_character)) {
-						Przeciwnik[i].x = last_pos_comp[i][0];
-						Przeciwnik[i].y = last_pos_comp[i][1];
-						pos_player[0][0] = last_pos_player[0][0];
-						pos_player[0][1] = last_pos_player[0][1];
-					}
-					if (collision(Przeciwnik[i].x, width_enemy, pos_player[1][0], Przeciwnik[i].y, height_enemy, pos_player[1][1], height_character)) {
-						Przeciwnik[i].x = last_pos_comp[i][0];
-						Przeciwnik[i].y = last_pos_comp[i][1];
-						pos_player[1][0] = last_pos_player[1][0];
-						pos_player[1][1] = last_pos_player[1][1];
-					}
+for (i = 0; i < MAX_NUMBER_OF_ENEMIES; i++)
+{
+	if (Przeciwnik[i].alive)
+	{
+		int random_x[MAX_NUMBER_OF_ENEMIES];
+		int random_y[MAX_NUMBER_OF_ENEMIES];
+		int losowa[MAX_NUMBER_OF_ENEMIES];
+		if (enemy_timer_cooldown[0][i] <= 0 && !frozen) {
+			losowa[i] = rand() % 4;
+			enemy_timer_cooldown[0][i] = COOLDOWN_ON_ENEMIES_DIRECTION;
+			random_x[i] = rand() % SPEED_OF_ENEMIES;
+			random_y[i] = rand() % SPEED_OF_ENEMIES;
+		}
+		if (enemy_timer_cooldown[1][i] <= 0 && rand() % PROBABILITY_THAT_ENEMY_SHOOTS == 0) {
+			temp = add_bullet(Przeciwnik[i].x, Przeciwnik[i].y + 20, direction[0], 1);
+			bullets[temp].alive = 1;
+			enemy_timer_cooldown[1][i] = COOLDOWN_ON_ENEMIES_SHOTS;
+		}
+		last_pos_comp[i][0] = Przeciwnik[i].x;
+		last_pos_comp[i][1] = Przeciwnik[i].y;
+		switch (losowa[i]) {
+		case 0: Przeciwnik[i].x += random_x[i]; break;
+		case 1: Przeciwnik[i].y += random_y[i]; break;
+		case 2: Przeciwnik[i].x -= random_x[i]; break;
+		case 3:Przeciwnik[i].y -= random_y[i]; break;
+		}
+		for (int t = 0; t < 11; t++) {
+			for (int z = 0; z < 28; z++) {
+				if (objMap[t][z] == 1 && collision(Przeciwnik[i].x, width_enemy, z * 48, Przeciwnik[i].y, height_enemy, t * 70, height_flask)) {
+					Przeciwnik[i].x = last_pos_comp[i][0];
+					Przeciwnik[i].y = last_pos_comp[i][1];
 				}
 			}
+		}
+		if (Przeciwnik[i].x < 0) { Przeciwnik[i].x = 0; enemy_timer_cooldown[0][i] = -1.0f; }
+		if (Przeciwnik[i].y < 0) { Przeciwnik[i].y = 0; enemy_timer_cooldown[0][i] = -1.0f; }
+		if (Przeciwnik[i].y + height_enemy >= height) { Przeciwnik[i].y = height - height_enemy;  enemy_timer_cooldown[0][i] = -1.0f; }
+		if (Przeciwnik[i].x + width_enemy >= width) {
+			Przeciwnik[i].x = width - width_enemy; enemy_timer_cooldown[0][i] = -1.0f;
+		}
+		if (collision(Przeciwnik[i].x, width_enemy, SYMBOL[0], Przeciwnik[i].y, height_enemy, SYMBOL[1], height_symbol)) {
+			Przeciwnik[i].x = last_pos_comp[i][0];
+			Przeciwnik[i].y = last_pos_comp[i][1];
+		}
+		if (collision(Przeciwnik[i].x, width_enemy, pos_player[0][0], Przeciwnik[i].y, height_enemy, pos_player[0][1], height_character)) {
+			Przeciwnik[i].x = last_pos_comp[i][0];
+			Przeciwnik[i].y = last_pos_comp[i][1];
+			pos_player[0][0] = last_pos_player[0][0];
+			pos_player[0][1] = last_pos_player[0][1];
+		}
+		if (collision(Przeciwnik[i].x, width_enemy, pos_player[1][0], Przeciwnik[i].y, height_enemy, pos_player[1][1], height_character)) {
+			Przeciwnik[i].x = last_pos_comp[i][0];
+			Przeciwnik[i].y = last_pos_comp[i][1];
+			pos_player[1][0] = last_pos_player[1][0];
+			pos_player[1][1] = last_pos_player[1][1];
+		}
+	}
+}
 
-			for (i = 0; i < MAX_BULLETS; i++)
-			{
-				if (bullets[i].alive)
-				{
-					if (bullets[i].x < 0 || bullets[i].y < 0 || bullets[i].x > width || bullets[i].y > height)
-						bullets[i].alive = 0;
-					for (int j = 0; j <MAX_NUMBER_OF_ENEMIES; j++) {
-						if (bullets[i].whose != 1 && Przeciwnik[j].died == 0 && Przeciwnik[j].alive && collision(bullets[i].x, width_bullet, Przeciwnik[j].x, bullets[i].y, height_bullet, Przeciwnik[j].y, height_enemy)) {
-							bullets[i].alive = 0;
-							if (--Przeciwnik[j].lifes == 0) {
-								if (Przeciwnik[j].boss) {
-									Przeciwnik[j].boss = 0;
-									global_score += POINTS_FOR_BOSS;
-									temp = create_bonus(Bonus, Przeciwnik[j].x, Przeciwnik[j].y);
-									Bonus[temp].alive = 1;
-								}
-								else global_score += POINTS_FOR_ENEMY;
-								Przeciwnik[j].alive = 0;
-								Przeciwnik[j].died = 1;
-								enemies_killed++;
-								enemies_count--;
-							}
-							if (enemies_killed == MAX_NUMBER_OF_ENEMIES) {
-								al_draw_bitmap(BMP_START, 0, 0, 0);
-								al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
-								al_flip_display();
-								al_stop_timer(timer_stage);
-								clean_everything();
-								enemies_killed = 0;
-								al_rest(10.0);
-								al_start_timer(timer_stage);
-								draw_stage(++stage);
-							}
-						}
+for (i = 0; i < MAX_BULLETS; i++)
+{
+	if (bullets[i].alive)
+	{
+		if (bullets[i].x < 0 || bullets[i].y < 0 || bullets[i].x > width || bullets[i].y > height)
+			bullets[i].alive = 0;
+		for (int j = 0; j < MAX_NUMBER_OF_ENEMIES; j++) {
+			if (bullets[i].whose != 1 && Przeciwnik[j].died == 0 && Przeciwnik[j].alive && collision(bullets[i].x, width_bullet, Przeciwnik[j].x, bullets[i].y, height_bullet, Przeciwnik[j].y, height_enemy)) {
+				bullets[i].alive = 0;
+				if (--Przeciwnik[j].lifes == 0) {
+					if (Przeciwnik[j].boss) {
+						Przeciwnik[j].boss = 0;
+						global_score += POINTS_FOR_BOSS;
+						temp = create_bonus(Bonus, Przeciwnik[j].x, Przeciwnik[j].y);
+						Bonus[temp].alive = 1;
 					}
-					if (bullets[i].whose == 1 && collision(bullets[i].x, width_bullet, pos_player[0][0], bullets[i].y, height_bullet, pos_player[0][1], height_character)) {
-						bullets[i].alive = 0;
-						player_alive[0] = false;
-						pos_player[0][0] = -100;
-						pos_player[0][1] = -100;
-					}
-					if (bullets[i].whose == 1 && collision(bullets[i].x, width_bullet, pos_player[1][0], bullets[i].y, height_bullet, pos_player[1][1], height_character)) {
-						bullets[i].alive = 0;
-						player_alive[1] = false;
-						pos_player[1][0] = -100;
-						pos_player[1][1] = -100;
-					}
-					for (int t = 0; t <13; t++) {
+					else global_score += POINTS_FOR_ENEMY;
+					Przeciwnik[j].alive = 0;
+					Przeciwnik[j].died = 1;
+					enemies_killed++;
+					enemies_count--;
+				}
+				if (enemies_killed >= MAX_NUMBER_OF_ENEMIES) {
+					al_draw_bitmap(BMP_START, 0, 0, 0);
+					al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
+					al_flip_display();
+					al_stop_timer(timer_stage);
+					clean_everything();
+					enemies_killed = 0;
+					al_rest(10.0);
+					al_start_timer(timer_stage);
+					draw_stage(++stage);
+				}
+			}
+		}
+		if (!immunity[0] && bullets[i].whose == 1 && collision(bullets[i].x, width_bullet, pos_player[0][0], bullets[i].y, height_bullet, pos_player[0][1], height_character) && player_lifes[0] == 1) {
+			bullets[i].alive = 0;
+			player_lifes[0] = 0;
+			player_alive[0] = false;
+			pos_player[0][0] = -100;
+			pos_player[0][1] = -100;
+		}
+		if (!immunity[0] && bullets[i].whose == 1 && collision(bullets[i].x, width_bullet, pos_player[0][0], bullets[i].y, height_bullet, pos_player[0][1], height_character) && player_lifes[0] > 1){
+		pos_player[0][0] = width / 2 - 100;
+		pos_player[0][1] = height - 80;
+		player_lifes[0]--;
+		}
+		if (!immunity[1] && bullets[i].whose == 1 && collision(bullets[i].x, width_bullet, pos_player[1][0], bullets[i].y, height_bullet, pos_player[1][1], height_character) && player_lifes[1] == 1) {
+			bullets[i].alive = 0;
+			player_lifes[1] = 0;
+			player_alive[1] = false;
+			pos_player[1][0] = -100;
+			pos_player[1][1] = -100;
+		}
+		if (!immunity[1] && bullets[i].whose == 1 && collision(bullets[i].x, width_bullet, pos_player[0][0], bullets[i].y, height_bullet, pos_player[0][1], height_character) && player_lifes[1] > 1) {
+			pos_player[1][0] = width / 2 - 100;
+			pos_player[1][1] = height - 80;
+			player_lifes[1]--;
+		}
+					for (int t = 0; t <11; t++) {
 						for (int z = 0; z < 28; z++) {
 							if (objMap[t][z] == 1 && collision(bullets[i].x, width_bullet, z * 48, bullets[i].y, height_bullet, t * 70, height_flask)) {
 								bullets[i].alive = 0;
@@ -689,7 +721,7 @@ void pre_start_game() {
 				pos_player[1][1] = last_pos_player[1][1];
 			}
 			if (player_alive[0]) {
-				for (int t = 0; t < 13; t++) {
+				for (int t = 0; t < 11; t++) {
 					for (int i = 0; i < 28; i++) {
 						if (objMap[t][i] == 1 && collision(pos_player[0][0], width_character, i * 48, pos_player[0][1], height_character, t * 70, height_flask)) {
 							pos_player[0][0] = last_pos_player[0][0];
@@ -708,6 +740,14 @@ void pre_start_game() {
 				for (int i = 0; i < MAX_BONUS; i++) {
 					if (Bonus[i].alive && collision(pos_player[0][0], width_character, Bonus[i].x, pos_player[0][1], height_character, Bonus[i].y, Bonus[i].height)) {
 						switch (Bonus[i].type) {
+						case 0: {
+							if (player_timer_cooldown[2] <= 0) {
+								immunity[0] = true;
+								player_timer_cooldown[2] = TIME_OF_BEEING_UNDEAD;
+							}
+							Bonus[i].alive = 0;
+							break;
+						}
 						case 1: {
 							for (int j = 0; j < MAX_NUMBER_OF_ENEMIES; j++) {
 								if (Przeciwnik[j].alive == 1 && Przeciwnik[j].died == 0) {
@@ -720,25 +760,50 @@ void pre_start_game() {
 									enemies_count--;
 								}
 							}
+							if (enemies_killed == MAX_NUMBER_OF_ENEMIES) {
+								al_draw_bitmap(BMP_START, 0, 0, 0);
+								al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
+								al_flip_display();
+								al_stop_timer(timer_stage);
+								clean_everything();
+								enemies_killed = 0;
+								al_rest(10.0);
+								al_start_timer(timer_stage);
+								draw_stage(++stage);
+							}
 							break;
 						}
-								if (enemies_killed == MAX_NUMBER_OF_ENEMIES) {
-									al_draw_bitmap(BMP_START, 0, 0, 0);
-									al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
-									al_flip_display();
-									al_stop_timer(timer_stage);
-									clean_everything();
-									enemies_killed = 0;
-									al_rest(10.0);
-									al_start_timer(timer_stage);
-									draw_stage(++stage);
-								}
+						case 2: {
+							if (freeze_time <= 0 ) {
+								frozen = true;
+								freeze_time = FREEZE_ON_ENEMIES;
+							}
+							Bonus[i].alive = 0;
+							break;
+						}
+						case 3: {
+							Bonus[i].alive = 0;
+							player_lifes[0]++;
+							break;
+						}
+						case 4: {
+							Bonus[i].alive = 0;
+								for (int i = 13; i <= 15; i++) {
+									if (objMap[9][i] == 0)
+										objMap[9][i] = 1;
+							}
+								if (objMap[10][13] == 0)
+									objMap[10][13] = 1;
+								if (objMap[10][15] == 0)
+									objMap[10][15] = 1;
+							break;
+						}
 						}
 					}
 				}
 			}
 			if (number_of_players[1] == true && player_alive[1]) {
-				for (int t = 0; t <13; t++) {
+				for (int t = 0; t <11; t++) {
 					for (int i = 0; i < 28; i++) {
 						if (objMap[t][i] == 1 && collision(pos_player[1][0], width_character, i * 48, pos_player[1][1], height_character, t * 70, height_flask)) {
 							pos_player[1][0] = last_pos_player[1][0];
@@ -754,6 +819,70 @@ void pre_start_game() {
 				if (collision(pos_player[1][0], width_character, SYMBOL[0], pos_player[1][1], height_character, SYMBOL[1], height_symbol)) {
 					pos_player[1][0] = last_pos_player[1][0];
 					pos_player[1][1] = last_pos_player[1][1];
+				}
+				for (int i = 0; i < MAX_BONUS; i++) {
+					if (Bonus[i].alive && collision(pos_player[1][0], width_character, Bonus[i].x, pos_player[1][1], height_character, Bonus[i].y, Bonus[i].height)) {
+						switch (Bonus[i].type) {
+						case 0: {
+							if (player_timer_cooldown[3] <= 0) {
+								immunity[1] = true;
+								player_timer_cooldown[3] = TIME_OF_BEEING_UNDEAD;
+							}
+							Bonus[i].alive = 0;
+							break;
+						}
+						case 1: {
+							for (int j = 0; j < MAX_NUMBER_OF_ENEMIES; j++) {
+								if (Przeciwnik[j].alive == 1 && Przeciwnik[j].died == 0) {
+									Przeciwnik[j].alive = 0;
+									Przeciwnik[j].died = 1;
+									Przeciwnik[j].lifes = 0;
+									Przeciwnik[j].boss = 0;
+									Bonus[i].alive = 0;
+									enemies_killed++;
+									enemies_count--;
+										}
+									}
+							if (enemies_killed == MAX_NUMBER_OF_ENEMIES) {
+								al_draw_bitmap(BMP_START, 0, 0, 0);
+								al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
+								al_flip_display();
+								al_stop_timer(timer_stage);
+								clean_everything();
+								enemies_killed = 0;
+								al_rest(10.0);
+								al_start_timer(timer_stage);
+								draw_stage(++stage);
+							}
+								break;
+							}
+						case 2: {
+							if (freeze_time <= 0) {
+								frozen = true;
+								freeze_time = FREEZE_ON_ENEMIES;
+							}
+							Bonus[i].alive = 0;
+							break;
+						}
+						case 3: {
+							Bonus[i].alive = 0;
+							player_lifes[1]++;
+							break;
+						}
+						case 4: {
+							Bonus[i].alive = 0;
+							for (int i = 13; i <= 15; i++) {
+								if (objMap[9][i] == 0)
+									objMap[9][i] = 1;
+							}
+							if (objMap[10][13] == 0)
+								objMap[10][13] = 1;
+							if (objMap[10][15] == 0)
+								objMap[10][15] = 1;
+							break;
+						}
+						}
+					}
 				}
 			}
 
@@ -774,9 +903,12 @@ void pre_start_game() {
 			draw_bullets(bullets);
 			draw_enemies(Przeciwnik);
 			draw_bonus(Bonus);
-			al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), pos_score_x, 0, 0, "Wynik: %d", global_score);
+			if(number_of_players[1] == false)
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), pos_score_x, 0, 0, "Wynik: %d, Zyc: %d", global_score, player_lifes[0]);
+			else
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), pos_score_x, 0, 0, "Wynik: %d, Zyc[1]: %d, Zyc[2]: %d", global_score, player_lifes[0], player_lifes[1]);
 			create_enemy(Przeciwnik);
-			for (int t = 0; t < 13; t++) {
+			for (int t = 0; t < 11; t++) {
 				for (int i = 0; i < 28; i++) {
 					if (objMap[t][i] == 1)
 						al_draw_bitmap(BMP_TEXTURE_1, i*48, t*70, 0);
