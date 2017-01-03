@@ -1,5 +1,6 @@
 //////////////////////////////////// Maciej Wronski, Politechnika Gdanska ////////////////////////////////////////////
 
+#include<iostream>
 #include<allegro5\allegro.h>
 #include<allegro5\allegro_native_dialog.h>
 #include<allegro5\allegro_font.h>
@@ -76,17 +77,17 @@ enum KEYS { UP, DOWN, LEFT, RIGHT, SPACE };
 enum KEYS1 { W, S, A, D, CAPS };
 
 int objMap[11][28] =
-{{0,1,1,1,1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-{ 0,1,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
-{ 0,1,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,0,0},
-{ 0,1,1,1,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1,0,0,0},
-{ 0,1,0,0,0,0,0,0,0,1,0,1,1,1,0,0,0,0,0,1,1,1,0,1,0,0,0,0},
-{ 0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0},
-{ 0,1,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,1,1,1,0,1,0,0,0,0},
-{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,1,0,0,0},
-{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,1,0,0},
-{ 0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,1,0,},
-{ 0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,},
+{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+{ 0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0},
+{ 0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0},
 
 };
 
@@ -312,6 +313,12 @@ void draw_stage(int ktory) {
 		BMP_ENEMY = al_load_bitmap("przeciwnicy/calka.png");
 		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
 		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		if (!BMP_START || !BMP_SYMBOL || !BMP_TEXTURE_1 || !BMP_SEMESTER_OVER || !BMP_ENEMY || !BMP_ENEMY_BOSS || !BMP_BULLET_ENEMY) {
+			int error;
+			printf("Semester 1 bitmaps didnt load correctly. Program will exit\nEnter any key to continue");
+			scanf_s("%i", &error);
+			exit(EXIT_FAILURE);
+		}
 		al_flip_display();
 		break;
 	}
@@ -323,6 +330,12 @@ void draw_stage(int ktory) {
 		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/2_semestr_koniec.png");
 		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		if (!BMP_START || !BMP_SYMBOL || !BMP_TEXTURE_1 || !BMP_SEMESTER_OVER || !BMP_ENEMY || !BMP_ENEMY_BOSS || !BMP_BULLET_ENEMY) {
+			int error;
+			printf("Semester 2 bitmaps didnt load correctly. Program will exit\nEnter any key to continue");
+			scanf_s("%i", &error);
+			exit(EXIT_FAILURE);
+		}
 		al_flip_display();
 		break;
 	}
@@ -334,6 +347,12 @@ void draw_stage(int ktory) {
 		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/3_semestr_koniec.png");
 		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		if (!BMP_START || !BMP_SYMBOL || !BMP_TEXTURE_1 || !BMP_SEMESTER_OVER || !BMP_ENEMY || !BMP_ENEMY_BOSS || !BMP_BULLET_ENEMY) {
+			int error;
+			printf("Semester 3 bitmaps didnt load correctly. Program will exit\nEnter any key to continue");
+			scanf_s("%i", &error);
+			exit(EXIT_FAILURE);
+		}
 		al_flip_display();
 		break;
 	}
@@ -345,6 +364,12 @@ void draw_stage(int ktory) {
 		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
 		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/4_semestr_koniec.png");
+		if (!BMP_START || !BMP_SYMBOL || !BMP_TEXTURE_1 || !BMP_SEMESTER_OVER || !BMP_ENEMY || !BMP_ENEMY_BOSS || !BMP_BULLET_ENEMY) {
+			int error;
+			printf("Semester 4 bitmaps didnt load correctly. Program will exit\nEnter any key to continue");
+			scanf_s("%i", &error);
+			exit(EXIT_FAILURE);
+		}
 		al_flip_display();
 		break;
 	}
@@ -356,6 +381,12 @@ void draw_stage(int ktory) {
 		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
 		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/5_semestr_koniec.png");
+		if (!BMP_START || !BMP_SYMBOL || !BMP_TEXTURE_1 || !BMP_SEMESTER_OVER || !BMP_ENEMY || !BMP_ENEMY_BOSS || !BMP_BULLET_ENEMY) {
+			int error;
+			printf("Semester 5 bitmaps didnt load correctly. Program will exit\nEnter any key to continue");
+			scanf_s("%i", &error);
+			exit(EXIT_FAILURE);
+		}
 		al_flip_display();
 		break;
 	}
@@ -367,6 +398,12 @@ void draw_stage(int ktory) {
 		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
 		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/6_semestr_koniec.png");
+		if (!BMP_START || !BMP_SYMBOL || !BMP_TEXTURE_1 || !BMP_SEMESTER_OVER || !BMP_ENEMY || !BMP_ENEMY_BOSS || !BMP_BULLET_ENEMY) {
+			int error;
+			printf("Semester 6 bitmaps didnt load correctly. Program will exit\nEnter any key to continue");
+			scanf_s("%i", &error);
+			exit(EXIT_FAILURE);
+		}
 		al_flip_display();
 		break;
 	}
@@ -378,6 +415,12 @@ void draw_stage(int ktory) {
 		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
 		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/6_semestr_koniec.png");
+		if (!BMP_START || !BMP_SYMBOL || !BMP_TEXTURE_1 || !BMP_SEMESTER_OVER || !BMP_ENEMY || !BMP_ENEMY_BOSS || !BMP_BULLET_ENEMY) {
+			int error;
+			printf("Semester 7 bitmaps didnt load correctly. Program will exit\nEnter any key to continue");
+			scanf_s("%i", &error);
+			exit(EXIT_FAILURE);
+		}
 		al_flip_display();
 		break;
 	}
@@ -925,15 +968,28 @@ int main(void) {
 	ALLEGRO_DISPLAY *display = NULL;
 	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 	ALLEGRO_TIMER *timer = NULL;
-	if (!al_init())
+	if (!al_init()){
+		int error;
+		printf("Allegro didnt load correctly. Program will exit\nPress any key to continue");
+		scanf_s("%i", &error);
 		return -1;
+	}
 	if (!al_install_audio()) {
+		int error;
+		printf("install_audio didnt  load correctly. Program will exit\nPress any key to continue");
+		scanf_s("%i", &error);
 		return -1;
 	}
 	if (!al_init_acodec_addon()) {
+		int error;
+		printf("Codec addon didnt load correctly. Program will exit\nPress any key to continue");
+		scanf_s("%i", &error);
 		return -1;
 	}
 	if (!al_reserve_samples(1)) {
+		int error;
+		printf("Reserve samples didnt load correctly. Program will exit\nPress any key to continue");
+		scanf_s("%i", &error);
 		return -1;
 	}
 	al_get_monitor_info(0, &Monitor_info);
@@ -942,10 +998,17 @@ int main(void) {
 
 	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
 	display = al_create_display(width, height);
-	if (!display)
+	if (!display) {
+		int error;
+		printf("Display didnt load correctly. Program will exit\nPress any key to continue");
+		scanf_s("%i", &error);
 		return -1;
-	sample = al_load_sample("dzwieki/main.wav");
+	}
+	sample = al_load_sample("dzwieki/s.wav");
 	if (!sample) {
+		int error;
+		printf("Sample didnt load correctly. Program will exit\nPress any key to continue");
+		scanf_s("%i", &error);
 		return -1;
 	}
 	///////////// addony////////////////
@@ -984,6 +1047,12 @@ int main(void) {
 	BMP_RENOVATION = al_load_bitmap("bonusybmp/odnowa.png");
 	ALLEGRO_FONT *FONT_SCORE = al_load_font("fonts/georgia.ttf", 24, 0);
 	icon = al_load_bitmap("wejsciowe/ikona.png");
+	if (!icon || !FONT_SCORE || !BMP_BULLET || !BMP_START || !BMP_NEWGAME || !BMP_CREDITS || !BMP_EXIT || !BMP_EXIT || !BMP_OPTIONS || !BMP_RECORDS || !BMP_ONE_PLAYER || !BMP_TWO_PLAYERS || !BMP_MUSIC || !BMP_MUSIC_CURRENT || !BMP_CHARACTER_UP || !BMP_CHARACTER_DOWN || !BMP_CHARACTER_UP || !BMP_CHARACTER_LEFT || !BMP_CHARACTER_RIGHT || !BMP_CHARACTER_UP_2 || !BMP_CHARACTER_DOWN_2 || !BMP_CHARACTER_LEFT_2 || !BMP_CHARACTER_RIGHT_2 || !BMP_BULLET || !BMP_BULLET_2 || !BMP_UNDEAD ||!BMP_FREEZE || !BMP_LIFE || !BMP_DESTROY || !BMP_RENOVATION) {
+		int error;
+		printf("One of bitmaps didnt load correctly in menu. Program will exit\nPress any key to continue");
+		scanf_s("%i", &error);
+		return -1;
+	}
 	al_set_display_icon(display, icon);
 	al_hide_mouse_cursor(display);
 	////////// rysowanie poczatkowego menu //////////////////
@@ -1035,6 +1104,12 @@ int main(void) {
 						al_destroy_bitmap(BMP_MUSIC_CURRENT);
 						BMP_MUSIC_CURRENT = al_load_bitmap("wejsciowe/WYLACZONA.png");
 						al_draw_bitmap(BMP_MUSIC_CURRENT, width / 2 - 50, height / 2 - 40, 0);
+						if (!BMP_START || !BMP_MUSIC || !BMP_MUSIC_CURRENT) {
+							int error;
+							printf("Music menu didnt load correctly. Program will exit\nEnter any key to continue");
+							scanf_s("%i", &error);
+							exit(EXIT_FAILURE);
+						}
 						music_on = false;
 						al_stop_samples();
 						al_flip_display();
@@ -1055,6 +1130,12 @@ int main(void) {
 						al_destroy_bitmap(BMP_MUSIC_CURRENT);
 						BMP_MUSIC_CURRENT = al_load_bitmap("wejsciowe/WLACZONA.png");
 						al_draw_bitmap(BMP_MUSIC_CURRENT, width / 2 - 50, height / 2 - 40, 0);
+						if (!BMP_START || !BMP_MUSIC || !BMP_MUSIC_CURRENT) {
+							int error;
+							printf("Music menu didnt load correctly. Program will exit\nEnter any key to continue");
+							scanf_s("%i", &error);
+							exit(EXIT_FAILURE);
+						}
 						al_flip_display();
 						al_play_sample(sample, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
 						music_on = true;
