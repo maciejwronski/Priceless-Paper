@@ -148,8 +148,7 @@ typedef struct obiekt {
 
 obiekt bullets[MAX_BULLETS];
 
-int add_bullet(int x, int y, int kierunek, int whose_bullet) // 0 - gracz 1 - komputer
-{
+int add_bullet(int x, int y, int kierunek, int whose_bullet){ // 0 - gracz 1 - komputer 2 -- gracz 2
 	int i;
 
 	for (i = 0; i < MAX_BULLETS; i++) {
@@ -161,7 +160,6 @@ int add_bullet(int x, int y, int kierunek, int whose_bullet) // 0 - gracz 1 - ko
 			return i;
 		}
 	}
-
 	return(0);
 }
 
@@ -235,8 +233,8 @@ void draw_bonus(bonus Bonus[]) {
 		}
 	}
 }
-bool collision(int pos_x1, int width_x1, int pos_x2, int pos_y1, int height_y1, int pos_y2, int height_y2) {
-	if (pos_x1 + width_x1 >= pos_x2 && pos_x1 <= pos_x2 + width_x1 && pos_y1 + height_y1 >= pos_y2 && pos_y1 <= pos_y2 + height_y2)
+bool collision(int pos_x1, int width_x1, int pos_x2, int width_x2, int pos_y1, int height_y1, int pos_y2, int height_y2) {
+	if (pos_x1 + width_x1 >= pos_x2 && pos_x1 <= pos_x2 + width_x2 && pos_y1 + height_y1 >= pos_y2 && pos_y1 <= pos_y2 + height_y2)
 		return true;
 	else return false;
 }
@@ -252,7 +250,7 @@ void create_enemy(przeciwnik Przeciwnik[]) {
 				Przeciwnik[i].y = (rand() % height - 60) + 50;
 				for (int t = 0; t <11; t++) {
 					for (int z = 0; z < 28; z++) {
-						if (objMap[t][z] != 0 && collision(Przeciwnik[i].x, al_get_bitmap_width(BMP_ENEMY), z * 48, Przeciwnik[i].y, al_get_bitmap_height(BMP_ENEMY), t * 70, al_get_bitmap_width(BMP_TEXTURE_1))) {
+						if (objMap[t][z] != 0 && collision(Przeciwnik[i].x, al_get_bitmap_width(BMP_ENEMY), z * 48, al_get_bitmap_width(BMP_TEXTURE_1), Przeciwnik[i].y, al_get_bitmap_height(BMP_ENEMY), t * 70, al_get_bitmap_height(BMP_TEXTURE_1))) {
 							Przeciwnik[i].x = (rand() % width) + 30;
 							Przeciwnik[i].y = (rand() % height - 60) + 50;
 						}
@@ -637,7 +635,7 @@ for (i = 0; i < MAX_NUMBER_OF_ENEMIES; i++)
 		}
 		for (int t = 0; t < 11; t++) {
 			for (int z = 0; z < 28; z++) {
-				if (objMap[t][z] == 1 && collision(Przeciwnik[i].x, width_enemy, z * 48, Przeciwnik[i].y, height_enemy, t * 70, height_flask)) {
+				if (objMap[t][z] == 1 && collision(Przeciwnik[i].x, width_enemy, z * 48, width_flask, Przeciwnik[i].y, height_enemy, t * 70, height_flask)) {
 					Przeciwnik[i].x = last_pos_comp[i][0];
 					Przeciwnik[i].y = last_pos_comp[i][1];
 				}
@@ -649,17 +647,17 @@ for (i = 0; i < MAX_NUMBER_OF_ENEMIES; i++)
 		if (Przeciwnik[i].x + width_enemy >= width) {
 			Przeciwnik[i].x = width - width_enemy; enemy_timer_cooldown[0][i] = -1.0f;
 		}
-		if (collision(Przeciwnik[i].x, width_enemy, SYMBOL[0], Przeciwnik[i].y, height_enemy, SYMBOL[1], height_symbol)) {
+		if (collision(Przeciwnik[i].x, width_enemy, SYMBOL[0], width_symbol,Przeciwnik[i].y, height_enemy, SYMBOL[1], height_symbol)) {
 			Przeciwnik[i].x = last_pos_comp[i][0];
 			Przeciwnik[i].y = last_pos_comp[i][1];
 		}
-		if (collision(Przeciwnik[i].x, width_enemy, pos_player[0][0], Przeciwnik[i].y, height_enemy, pos_player[0][1], height_character)) {
+		if (collision(Przeciwnik[i].x, width_enemy, pos_player[0][0], width_character, Przeciwnik[i].y, height_enemy, pos_player[0][1], height_character)) {
 			Przeciwnik[i].x = last_pos_comp[i][0];
 			Przeciwnik[i].y = last_pos_comp[i][1];
 			pos_player[0][0] = last_pos_player[0][0];
 			pos_player[0][1] = last_pos_player[0][1];
 		}
-		if (collision(Przeciwnik[i].x, width_enemy, pos_player[1][0], Przeciwnik[i].y, height_enemy, pos_player[1][1], height_character)) {
+		if (collision(Przeciwnik[i].x, width_enemy, pos_player[1][0], width_character, Przeciwnik[i].y, height_enemy, pos_player[1][1], height_character)) {
 			Przeciwnik[i].x = last_pos_comp[i][0];
 			Przeciwnik[i].y = last_pos_comp[i][1];
 			pos_player[1][0] = last_pos_player[1][0];
@@ -675,7 +673,7 @@ for (i = 0; i < MAX_BULLETS; i++)
 		if (bullets[i].x < 0 || bullets[i].y < 0 || bullets[i].x > width || bullets[i].y > height)
 			bullets[i].alive = 0;
 		for (int j = 0; j < MAX_NUMBER_OF_ENEMIES; j++) {
-			if (bullets[i].whose != 1 && Przeciwnik[j].died == 0 && Przeciwnik[j].alive && collision(bullets[i].x, width_bullet, Przeciwnik[j].x, bullets[i].y, height_bullet, Przeciwnik[j].y, height_enemy)) {
+			if (bullets[i].whose != 1 && Przeciwnik[j].died == 0 && Przeciwnik[j].alive && collision(bullets[i].x, width_bullet, Przeciwnik[j].x, width_enemy,bullets[i].y, height_bullet, Przeciwnik[j].y, height_enemy)) {
 				bullets[i].alive = 0;
 				if (--Przeciwnik[j].lifes == 0) {
 					if (Przeciwnik[j].boss) {
@@ -703,39 +701,39 @@ for (i = 0; i < MAX_BULLETS; i++)
 				}
 			}
 		}
-		if (!immunity[0] && bullets[i].whose == 1 && collision(bullets[i].x, width_bullet, pos_player[0][0], bullets[i].y, height_bullet, pos_player[0][1], height_character) && player_lifes[0] == 1) {
+		if (!immunity[0] && bullets[i].whose == 1 && collision(bullets[i].x, width_bullet, pos_player[0][0], width_character, bullets[i].y, height_bullet, pos_player[0][1], height_character) && player_lifes[0] == 1) {
 			bullets[i].alive = 0;
 			player_lifes[0] = 0;
 			player_alive[0] = false;
 			pos_player[0][0] = -100;
 			pos_player[0][1] = -100;
 		}
-		if (!immunity[0] && bullets[i].whose == 1 && collision(bullets[i].x, width_bullet, pos_player[0][0], bullets[i].y, height_bullet, pos_player[0][1], height_character) && player_lifes[0] > 1){
+		if (!immunity[0] && bullets[i].whose == 1 && collision(bullets[i].x, width_bullet, pos_player[0][0], width_character, bullets[i].y, height_bullet, pos_player[0][1], height_character) && player_lifes[0] > 1){
 		pos_player[0][0] = width / 2 - 100;
 		pos_player[0][1] = height - 80;
 		player_lifes[0]--;
 		}
-		if (!immunity[1] && bullets[i].whose == 1 && collision(bullets[i].x, width_bullet, pos_player[1][0], bullets[i].y, height_bullet, pos_player[1][1], height_character) && player_lifes[1] == 1) {
+		if (!immunity[1] && bullets[i].whose == 1 && collision(bullets[i].x, width_bullet, pos_player[1][0], width_character, bullets[i].y, height_bullet, pos_player[1][1], height_character) && player_lifes[1] == 1) {
 			bullets[i].alive = 0;
 			player_lifes[1] = 0;
 			player_alive[1] = false;
 			pos_player[1][0] = -100;
 			pos_player[1][1] = -100;
 		}
-		if (!immunity[1] && bullets[i].whose == 1 && collision(bullets[i].x, width_bullet, pos_player[0][0], bullets[i].y, height_bullet, pos_player[0][1], height_character) && player_lifes[1] > 1) {
+		if (!immunity[1] && bullets[i].whose == 1 && collision(bullets[i].x, width_bullet, pos_player[0][0], width_character, bullets[i].y, height_bullet, pos_player[0][1], height_character) && player_lifes[1] > 1) {
 			pos_player[1][0] = width / 2 - 100;
 			pos_player[1][1] = height - 80;
 			player_lifes[1]--;
 		}
 					for (int t = 0; t <11; t++) {
 						for (int z = 0; z < 28; z++) {
-							if (objMap[t][z] == 1 && collision(bullets[i].x, width_bullet, z * 48, bullets[i].y, height_bullet, t * 70, height_flask)) {
+							if (objMap[t][z] == 1 && collision(bullets[i].x, width_bullet, z * 48, width_flask, bullets[i].y, height_bullet, t * 70, height_flask)) {
 								bullets[i].alive = 0;
 								objMap[t][z] = 0;
 							}
 						}
 					}
-					if (collision(bullets[i].x, width_bullet, SYMBOL[0], bullets[i].y, height_bullet, SYMBOL[1], height_symbol)) {
+					if (collision(bullets[i].x, width_bullet, SYMBOL[0], width_symbol, bullets[i].y, height_bullet, SYMBOL[1], height_symbol)) {
 						bullets[i].alive = 0;
 						in_game = false;
 					}
@@ -757,7 +755,7 @@ for (i = 0; i < MAX_BULLETS; i++)
 				pos_player[1][0] -= keys1[A] * SPEED_OF_PLAYER;
 				pos_player[1][0] += keys1[D] * SPEED_OF_PLAYER;
 			}
-			if (player_alive[0] && player_alive[1] && collision(pos_player[0][0], width_character, pos_player[1][0], pos_player[0][1], height_character, pos_player[1][1], height_character)){
+			if (player_alive[0] && player_alive[1] && collision(pos_player[0][0], width_character, pos_player[1][0], width_character, pos_player[0][1], height_character, pos_player[1][1], height_character)){
 				pos_player[0][0] = last_pos_player[0][0];
 				pos_player[0][1] = last_pos_player[0][1];
 				pos_player[1][0] = last_pos_player[1][0];
@@ -766,7 +764,7 @@ for (i = 0; i < MAX_BULLETS; i++)
 			if (player_alive[0]) {
 				for (int t = 0; t < 11; t++) {
 					for (int i = 0; i < 28; i++) {
-						if (objMap[t][i] == 1 && collision(pos_player[0][0], width_character, i * 48, pos_player[0][1], height_character, t * 70, height_flask)) {
+						if (objMap[t][i] == 1 && collision(pos_player[0][0], width_character, i * 48, width_flask, pos_player[0][1], height_character, t * 70, height_flask)) {
 							pos_player[0][0] = last_pos_player[0][0];
 							pos_player[0][1] = last_pos_player[0][1];
 						}
@@ -776,12 +774,12 @@ for (i = 0; i < MAX_BULLETS; i++)
 				if (pos_player[0][0] <= 0) pos_player[0][0] = 0;
 				if (pos_player[0][1] + height_character >= height) pos_player[0][1] = height - height_character;
 				if (pos_player[0][0] + width_character >= width) pos_player[0][0] = width - width_character;
-				if (collision(pos_player[0][0], width_character, SYMBOL[0], pos_player[0][1], height_character, SYMBOL[1], height_symbol)) {
+				if (collision(pos_player[0][0], width_character, SYMBOL[0], width_symbol, pos_player[0][1], height_character, SYMBOL[1], height_symbol)) {
 					pos_player[0][0] = last_pos_player[0][0];
 					pos_player[0][1] = last_pos_player[0][1];
 				}
 				for (int i = 0; i < MAX_BONUS; i++) {
-					if (Bonus[i].alive && collision(pos_player[0][0], width_character, Bonus[i].x, pos_player[0][1], height_character, Bonus[i].y, Bonus[i].height)) {
+					if (Bonus[i].alive && collision(pos_player[0][0], width_character, Bonus[i].x, Bonus[i].width, pos_player[0][1], height_character, Bonus[i].y, Bonus[i].height)) {
 						switch (Bonus[i].type) {
 						case 0: {
 							if (player_timer_cooldown[2] <= 0) {
@@ -848,7 +846,7 @@ for (i = 0; i < MAX_BULLETS; i++)
 			if (number_of_players[1] == true && player_alive[1]) {
 				for (int t = 0; t <11; t++) {
 					for (int i = 0; i < 28; i++) {
-						if (objMap[t][i] == 1 && collision(pos_player[1][0], width_character, i * 48, pos_player[1][1], height_character, t * 70, height_flask)) {
+						if (objMap[t][i] == 1 && collision(pos_player[1][0], width_character, i * 48, width_flask, pos_player[1][1], height_character, t * 70, height_flask)) {
 							pos_player[1][0] = last_pos_player[1][0];
 							pos_player[1][1] = last_pos_player[1][1];
 						}
@@ -859,12 +857,12 @@ for (i = 0; i < MAX_BULLETS; i++)
 			if (pos_player[1][0] <= 0) pos_player[1][0] = 0;
 				if (pos_player[1][1] + height_character >= height) pos_player[1][1] = height - height_character;
 				if (pos_player[1][0] + width_character >= width) pos_player[1][0] = width - width_character;
-				if (collision(pos_player[1][0], width_character, SYMBOL[0], pos_player[1][1], height_character, SYMBOL[1], height_symbol)) {
+				if (collision(pos_player[1][0], width_character, SYMBOL[0], width_symbol, pos_player[1][1], height_character, SYMBOL[1], height_symbol)) {
 					pos_player[1][0] = last_pos_player[1][0];
 					pos_player[1][1] = last_pos_player[1][1];
 				}
 				for (int i = 0; i < MAX_BONUS; i++) {
-					if (Bonus[i].alive && collision(pos_player[1][0], width_character, Bonus[i].x, pos_player[1][1], height_character, Bonus[i].y, Bonus[i].height)) {
+					if (Bonus[i].alive && collision(pos_player[1][0], width_character, Bonus[i].x, Bonus[i].width, pos_player[1][1], height_character, Bonus[i].y, Bonus[i].height)) {
 						switch (Bonus[i].type) {
 						case 0: {
 							if (player_timer_cooldown[3] <= 0) {
@@ -1071,7 +1069,7 @@ int main(void) {
 	al_start_timer(timer);
 	al_flip_display();
 	al_stop_samples();
-	//al_play_sample(sample, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
+	al_play_sample(sample, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
 	srand(time(NULL));
 	while (!left && !left_menu) {
 		ALLEGRO_EVENT ev;
@@ -1095,14 +1093,11 @@ int main(void) {
 				keys[LEFT] = true;
 				if (remember == 2) {
 					if (music_on) {
-						al_destroy_bitmap(BMP_START);
 						BMP_START = al_load_bitmap("wejsciowe/tlo_podstawowe2.png");
-						al_draw_bitmap(BMP_START, 0, 0, 0);
-						al_destroy_bitmap(BMP_MUSIC);
 						BMP_MUSIC = al_load_bitmap("wejsciowe/MUZYKA.png");
-						al_draw_bitmap(BMP_MUSIC, width / 2 - 350, height / 2 - 40, 0);
-						al_destroy_bitmap(BMP_MUSIC_CURRENT);
 						BMP_MUSIC_CURRENT = al_load_bitmap("wejsciowe/WYLACZONA.png");
+						al_draw_bitmap(BMP_START, 0, 0, 0);
+						al_draw_bitmap(BMP_MUSIC, width / 2 - 350, height / 2 - 40, 0);
 						al_draw_bitmap(BMP_MUSIC_CURRENT, width / 2 - 50, height / 2 - 40, 0);
 						if (!BMP_START || !BMP_MUSIC || !BMP_MUSIC_CURRENT) {
 							int error;
@@ -1121,21 +1116,18 @@ int main(void) {
 				keys[RIGHT] = true;
 				if (remember == 2) {
 					if (!music_on) {
-						al_destroy_bitmap(BMP_START);
 						BMP_START = al_load_bitmap("wejsciowe/tlo_podstawowe2.png");
-						al_draw_bitmap(BMP_START, 0, 0, 0);
-						al_destroy_bitmap(BMP_MUSIC);
 						BMP_MUSIC = al_load_bitmap("wejsciowe/MUZYKA.png");
-						al_draw_bitmap(BMP_MUSIC, width / 2 - 350, height / 2 - 40, 0);
-						al_destroy_bitmap(BMP_MUSIC_CURRENT);
 						BMP_MUSIC_CURRENT = al_load_bitmap("wejsciowe/WLACZONA.png");
-						al_draw_bitmap(BMP_MUSIC_CURRENT, width / 2 - 50, height / 2 - 40, 0);
 						if (!BMP_START || !BMP_MUSIC || !BMP_MUSIC_CURRENT) {
 							int error;
 							printf("Music menu didnt load correctly. Program will exit\nEnter any key to continue");
 							scanf_s("%i", &error);
 							exit(EXIT_FAILURE);
 						}
+						al_draw_bitmap(BMP_START, 0, 0, 0);
+						al_draw_bitmap(BMP_MUSIC, width / 2 - 350, height / 2 - 40, 0);
+						al_draw_bitmap(BMP_MUSIC_CURRENT, width / 2 - 50, height / 2 - 40, 0);
 						al_flip_display();
 						al_play_sample(sample, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
 						music_on = true;
@@ -1182,7 +1174,6 @@ int main(void) {
 					al_draw_bitmap(BMP_START, 0, 0, 0);
 					al_draw_bitmap(BMP_ONE_PLAYER, width / 2 - 300, height / 2 - 40, 0);
 					al_draw_bitmap(BMP_TWO_PLAYERS, width / 2 - 300, height / 2 + 15, 0);
-					al_flip_display();
 					remember = 0;
 					if (count_enter > 1) {
 						switch (menu[1]) {
@@ -1205,23 +1196,23 @@ int main(void) {
 					al_draw_bitmap(BMP_START, 0, 0, 0);
 					al_draw_bitmap(BMP_MUSIC, width / 2 - 350, height / 2 - 40, 0);
 					al_draw_bitmap(BMP_MUSIC_CURRENT, width / 2 - 50, height / 2 - 40, 0);
-					al_flip_display();
 					if (++count_enter > 1) count_enter = 1;
 					break;
 
 				case 3:  count_enter--;  break;
 				case 4: left = true; break;
 				}
+				al_flip_display();
 			}
 		}
 		else if (ev.type == ALLEGRO_EVENT_TIMER) {
 			if (keys[DOWN] == false && !locked[0] && !left_menu) {
 				switch (menu[0]) {
-				case 0:  al_destroy_bitmap(BMP_NEWGAME); al_destroy_bitmap(BMP_RECORDS);  BMP_NEWGAME = al_load_bitmap("wejsciowe/NOWA_GRA_WYBRANE.PNG"); BMP_RECORDS = al_load_bitmap("wejsciowe/REKORDY.png"); break;
-				case 1:  al_destroy_bitmap(BMP_RECORDS); al_destroy_bitmap(BMP_NEWGAME); al_destroy_bitmap(BMP_OPTIONS); BMP_RECORDS = al_load_bitmap("wejsciowe/REKORDY_WYBRANE.png"); BMP_NEWGAME = al_load_bitmap("wejsciowe/NOWA_GRA.png"); BMP_OPTIONS = al_load_bitmap("wejsciowe/OPCJE.png"); break;
-				case 2:  al_destroy_bitmap(BMP_CREDITS); al_destroy_bitmap(BMP_RECORDS); al_destroy_bitmap(BMP_OPTIONS); BMP_OPTIONS = al_load_bitmap("wejsciowe/OPCJE_WYBRANE.png"); BMP_RECORDS = al_load_bitmap("wejsciowe/REKORDY.png"); BMP_CREDITS = al_load_bitmap("wejsciowe/CREDITS.png"); break;
-				case 3:  al_destroy_bitmap(BMP_OPTIONS); al_destroy_bitmap(BMP_CREDITS); al_destroy_bitmap(BMP_EXIT); BMP_CREDITS = al_load_bitmap("wejsciowe/CREDITS_WYBRANE.png"); BMP_OPTIONS = al_load_bitmap("wejsciowe/OPCJE.png"); BMP_EXIT = al_load_bitmap("wejsciowe/ZAKONCZ_GRE.png"); break;
-				case 4:  al_destroy_bitmap(BMP_EXIT); al_destroy_bitmap(BMP_CREDITS);  BMP_EXIT = al_load_bitmap("wejsciowe/ZAKONCZ_GRE_WYBRANE.png"); BMP_CREDITS = al_load_bitmap("wejsciowe/CREDITS.png"); break;
+				case 0:  BMP_NEWGAME = al_load_bitmap("wejsciowe/NOWA_GRA_WYBRANE.PNG"); BMP_RECORDS = al_load_bitmap("wejsciowe/REKORDY.png"); break;
+				case 1:  BMP_RECORDS = al_load_bitmap("wejsciowe/REKORDY_WYBRANE.png"); BMP_NEWGAME = al_load_bitmap("wejsciowe/NOWA_GRA.png"); BMP_OPTIONS = al_load_bitmap("wejsciowe/OPCJE.png"); break;
+				case 2:  BMP_OPTIONS = al_load_bitmap("wejsciowe/OPCJE_WYBRANE.png"); BMP_RECORDS = al_load_bitmap("wejsciowe/REKORDY.png"); BMP_CREDITS = al_load_bitmap("wejsciowe/CREDITS.png"); break;
+				case 3:  BMP_CREDITS = al_load_bitmap("wejsciowe/CREDITS_WYBRANE.png"); BMP_OPTIONS = al_load_bitmap("wejsciowe/OPCJE.png"); BMP_EXIT = al_load_bitmap("wejsciowe/ZAKONCZ_GRE.png"); break;
+				case 4:  BMP_EXIT = al_load_bitmap("wejsciowe/ZAKONCZ_GRE_WYBRANE.png"); BMP_CREDITS = al_load_bitmap("wejsciowe/CREDITS.png"); break;
 				}
 				al_draw_bitmap(BMP_NEWGAME, width / 2 - 190, height / 2 - 40, 0);
 				al_draw_bitmap(BMP_RECORDS, width / 2 - 190, height / 2 + 15, 0);
@@ -1231,8 +1222,8 @@ int main(void) {
 			}
 			if (keys[DOWN] == false && locked[0] && remember == 0 && !left_menu) {
 				switch (menu[1]) {
-				case 0:  al_destroy_bitmap(BMP_ONE_PLAYER); al_destroy_bitmap(BMP_TWO_PLAYERS);  BMP_ONE_PLAYER = al_load_bitmap("wejsciowe/JEDEN_GRACZ_WYBRANE.PNG"); BMP_TWO_PLAYERS = al_load_bitmap("wejsciowe/DWOCH_GRACZY.png"); break;
-				case 1:  al_destroy_bitmap(BMP_ONE_PLAYER); al_destroy_bitmap(BMP_TWO_PLAYERS);   BMP_ONE_PLAYER = al_load_bitmap("wejsciowe/JEDEN_GRACZ.PNG"); BMP_TWO_PLAYERS = al_load_bitmap("wejsciowe/DWOCH_GRACZY_WYBRANE.png");  break;
+				case 0:  BMP_ONE_PLAYER = al_load_bitmap("wejsciowe/JEDEN_GRACZ_WYBRANE.PNG"); BMP_TWO_PLAYERS = al_load_bitmap("wejsciowe/DWOCH_GRACZY.png"); break;
+				case 1:  BMP_ONE_PLAYER = al_load_bitmap("wejsciowe/JEDEN_GRACZ.PNG"); BMP_TWO_PLAYERS = al_load_bitmap("wejsciowe/DWOCH_GRACZY_WYBRANE.png");  break;
 				}
 				al_draw_bitmap(BMP_ONE_PLAYER, width / 2 - 300, height / 2 - 40, 0);
 				al_draw_bitmap(BMP_TWO_PLAYERS, width / 2 - 300, height / 2 + 15, 0);
@@ -1250,7 +1241,6 @@ int main(void) {
 	al_destroy_bitmap(BMP_OPTIONS);
 	al_destroy_bitmap(BMP_RECORDS);
 	al_destroy_bitmap(BMP_ONE_PLAYER);
-	al_destroy_sample(sample);
 	al_destroy_bitmap(BMP_TWO_PLAYERS);
 	al_destroy_bitmap(BMP_MUSIC);
 	al_destroy_bitmap(BMP_MUSIC_CURRENT);
@@ -1280,6 +1270,9 @@ int main(void) {
 	al_destroy_bitmap(BMP_LIFE);
 	al_destroy_bitmap(BMP_RENOVATION);
 	al_destroy_bitmap(BMP_DESTROY);
-	al_destroy_event_queue(event_queue);
+	al_destroy_sample(sample);
 	al_destroy_timer(timer);
+	al_destroy_event_queue(event_queue);
+	al_destroy_display(display);
+
 }
