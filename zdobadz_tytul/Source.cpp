@@ -1126,11 +1126,6 @@ int main(void) {
 	al_hide_mouse_cursor(display);
 	////////// rysowanie poczatkowego menu //////////////////
 	al_draw_bitmap(BMP_START, 0, 0, 0);
-	//al_draw_bitmap(BMP_NEWGAME, (width / 2 - 190)*scale[0], (height / 2 - 40, 0);
-	//al_draw_bitmap(BMP_RECORDS, (width / 2 - 190)*scale[0], height / 2 + 15, 0);
-	//al_draw_bitmap(BMP_OPTIONS, (width / 2 - 190)*scale[0], height / 2 + 70, 0);
-	//al_draw_bitmap(BMP_CREDITS, (width / 2 - 190)*scale[0], height / 2 + 125, 0);
-	//al_draw_bitmap(BMP_EXIT, (width / 2 - 190)*scale[0], height / 2 + 180, 0);
 	///////////////////// queue + timer 
 	event_queue = al_create_event_queue();
 	timer = al_create_timer(DeltaTime);
@@ -1173,10 +1168,7 @@ int main(void) {
 						BMP_START = al_load_bitmap("wejsciowe/tlo_podstawowe2.png");
 						BMP_MUSIC = al_load_bitmap("wejsciowe/MUZYKA.png");
 						BMP_MUSIC_CURRENT = al_load_bitmap("wejsciowe/WYLACZONA.png");
-						//al_draw_bitmap(BMP_START, 0, 0, 0);
 						al_draw_scaled_bitmap(BMP_START, 0, 0, al_get_bitmap_width(BMP_START), al_get_bitmap_height(BMP_START), 0, 0, al_get_bitmap_width(BMP_START)*scale[0], al_get_bitmap_height(BMP_START)*scale[1], 0);
-						//al_draw_bitmap(BMP_MUSIC, constants_to_set_graphics[2][0], constants_to_set_graphics[1][0], 0);
-						//al_draw_bitmap(BMP_MUSIC_CURRENT, constants_to_set_graphics[2][1], constants_to_set_graphics[1][0], 0);
 						al_draw_scaled_bitmap(BMP_MUSIC, 0, 0, al_get_bitmap_width(BMP_MUSIC), al_get_bitmap_height(BMP_MUSIC), constants_to_set_graphics[2][0], constants_to_set_graphics[1][0], al_get_bitmap_width(BMP_MUSIC)*scale[0], al_get_bitmap_height(BMP_MUSIC)*scale[1], 0);
 						al_draw_scaled_bitmap(BMP_MUSIC_CURRENT, 0, 0, al_get_bitmap_width(BMP_MUSIC_CURRENT), al_get_bitmap_height(BMP_MUSIC_CURRENT), constants_to_set_graphics[2][1], constants_to_set_graphics[1][0], al_get_bitmap_width(BMP_MUSIC_CURRENT)*scale[0], al_get_bitmap_height(BMP_MUSIC_CURRENT)*scale[1], 0);
 						if (!BMP_START || !BMP_MUSIC || !BMP_MUSIC_CURRENT) {
@@ -1205,10 +1197,7 @@ int main(void) {
 							scanf_s("%i", &error);
 							exit(EXIT_FAILURE);
 						}
-						//al_draw_bitmap(BMP_START, 0, 0, 0);
 						al_draw_scaled_bitmap(BMP_START, 0, 0, al_get_bitmap_width(BMP_START), al_get_bitmap_height(BMP_START), 0, 0, al_get_bitmap_width(BMP_START)*scale[0], al_get_bitmap_height(BMP_START)*scale[1], 0);
-						//al_draw_bitmap(BMP_MUSIC, width / 2 - 350, height / 2 - 40, 0);
-						//al_draw_bitmap(BMP_MUSIC_CURRENT, width / 2 - 50, height / 2 - 40, 0);
 						al_draw_scaled_bitmap(BMP_MUSIC, 0, 0, al_get_bitmap_width(BMP_MUSIC), al_get_bitmap_height(BMP_MUSIC), constants_to_set_graphics[2][0], constants_to_set_graphics[1][0], al_get_bitmap_width(BMP_MUSIC)*scale[0], al_get_bitmap_height(BMP_MUSIC)*scale[1], 0);
 						al_draw_scaled_bitmap(BMP_MUSIC_CURRENT, 0, 0, al_get_bitmap_width(BMP_MUSIC_CURRENT), al_get_bitmap_height(BMP_MUSIC_CURRENT), constants_to_set_graphics[2][1], constants_to_set_graphics[1][0], al_get_bitmap_width(BMP_MUSIC_CURRENT)*scale[0], al_get_bitmap_height(BMP_MUSIC_CURRENT)*scale[1], 0);
 						al_flip_display();
@@ -1254,12 +1243,7 @@ int main(void) {
 						is_back = false;
 						locked[0] = true;
 					}
-					//al_draw_bitmap(BMP_START, 0, 0, 0);
 					al_draw_scaled_bitmap(BMP_START, 0, 0, al_get_bitmap_width(BMP_START), al_get_bitmap_height(BMP_START), 0, 0, al_get_bitmap_width(BMP_START)*scale[0], al_get_bitmap_height(BMP_START)*scale[1], 0);
-					//al_draw_bitmap(BMP_ONE_PLAYER, width / 2 - 300, height / 2 - 40, 0);
-					//al_draw_bitmap(BMP_TWO_PLAYERS, width / 2 - 300, height / 2 + 15, 0);
-					//al_draw_scaled_bitmap(BMP_ONE_PLAYER, 0, 0, al_get_bitmap_width(BMP_ONE_PLAYER), al_get_bitmap_height(BMP_ONE_PLAYER), constants_to_set_graphics[1][0], constants_to_set_graphics[0][1], al_get_bitmap_width(BMP_ONE_PLAYER)*scale[0], al_get_bitmap_height(BMP_ONE_PLAYER)*scale[1], 0);
-					//al_draw_scaled_bitmap(BMP_TWO_PLAYERS, 0, 0, al_get_bitmap_width(BMP_TWO_PLAYERS), al_get_bitmap_height(BMP_TWO_PLAYERS), constants_to_set_graphics[1][0] + constants_to_set_graphics[0][2], constants_to_set_graphics[0][1], al_get_bitmap_width(BMP_TWO_PLAYERS)*scale[0], al_get_bitmap_height(BMP_TWO_PLAYERS)*scale[1], 0);
 					remember = 0;
 					if (count_enter > 1) {
 						switch (menu[1]) {
@@ -1279,12 +1263,9 @@ int main(void) {
 						is_back = false;
 						locked[0] = true;
 					}
-					//al_draw_bitmap(BMP_START, 0, 0, 0);
 					al_draw_scaled_bitmap(BMP_START, 0, 0, al_get_bitmap_width(BMP_START), al_get_bitmap_height(BMP_START), 0, 0, al_get_bitmap_width(BMP_START)*scale[0], al_get_bitmap_height(BMP_START)*scale[1], 0);
-					//al_draw_bitmap(BMP_MUSIC, width / 2 - 350, height / 2 - 40, 0);
-					//al_draw_bitmap(BMP_MUSIC_CURRENT, width / 2 - 50, height / 2 - 40, 0);
-					al_draw_scaled_bitmap(BMP_MUSIC, 0, 0, al_get_bitmap_width(BMP_MUSIC), al_get_bitmap_height(BMP_MUSIC), constants_to_set_graphics[2][0], constants_to_set_graphics[0][1], al_get_bitmap_width(BMP_MUSIC)*scale[0], al_get_bitmap_height(BMP_MUSIC)*scale[1], 0);
-					al_draw_scaled_bitmap(BMP_MUSIC_CURRENT, 0, 0, al_get_bitmap_width(BMP_MUSIC_CURRENT), al_get_bitmap_height(BMP_MUSIC_CURRENT), constants_to_set_graphics[2][1], constants_to_set_graphics[0][1], al_get_bitmap_width(BMP_MUSIC_CURRENT)*scale[0], al_get_bitmap_height(BMP_MUSIC_CURRENT)*scale[1], 0);
+					al_draw_scaled_bitmap(BMP_MUSIC, 0, 0, al_get_bitmap_width(BMP_MUSIC), al_get_bitmap_height(BMP_MUSIC), constants_to_set_graphics[2][0], constants_to_set_graphics[1][0], al_get_bitmap_width(BMP_MUSIC)*scale[0], al_get_bitmap_height(BMP_MUSIC)*scale[1], 0);
+					al_draw_scaled_bitmap(BMP_MUSIC_CURRENT, 0, 0, al_get_bitmap_width(BMP_MUSIC_CURRENT), al_get_bitmap_height(BMP_MUSIC_CURRENT), constants_to_set_graphics[2][1], constants_to_set_graphics[1][0], al_get_bitmap_width(BMP_MUSIC_CURRENT)*scale[0], al_get_bitmap_height(BMP_MUSIC_CURRENT)*scale[1], 0);
 					if (++count_enter > 1) count_enter = 1;
 					break;
 
@@ -1303,11 +1284,6 @@ int main(void) {
 				case 3:  BMP_CREDITS = al_load_bitmap("wejsciowe/CREDITS_WYBRANE.png"); BMP_OPTIONS = al_load_bitmap("wejsciowe/OPCJE.png"); BMP_EXIT = al_load_bitmap("wejsciowe/ZAKONCZ_GRE.png"); break;
 				case 4:  BMP_EXIT = al_load_bitmap("wejsciowe/ZAKONCZ_GRE_WYBRANE.png"); BMP_CREDITS = al_load_bitmap("wejsciowe/CREDITS.png"); break;
 				}
-				//al_draw_bitmap(BMP_NEWGAME, width / 2 - 190, height / 2 - 40, 0);
-				//al_draw_bitmap(BMP_RECORDS, width / 2 - 190, height / 2 + 15, 0);
-				//al_draw_bitmap(BMP_OPTIONS, width / 2 - 190, height / 2 + 70, 0);
-				//al_draw_bitmap(BMP_CREDITS, width / 2 - 190, height / 2 + 125, 0);
-				//al_draw_bitmap(BMP_EXIT, width / 2 - 190, height / 2 + 180, 0);
 				al_draw_scaled_bitmap(BMP_START, 0, 0, al_get_bitmap_width(BMP_START), al_get_bitmap_height(BMP_START), 0, 0, al_get_bitmap_width(BMP_START)*scale[0], al_get_bitmap_height(BMP_START)*scale[1], 0);
 				al_draw_scaled_bitmap(BMP_NEWGAME, 0, 0, al_get_bitmap_width(BMP_NEWGAME), al_get_bitmap_height(BMP_NEWGAME),constants_to_set_graphics[0][0], constants_to_set_graphics[0][1] + constants_to_set_graphics[0][2], al_get_bitmap_width(BMP_NEWGAME)*scale[0], al_get_bitmap_height(BMP_NEWGAME)*scale[1], 0);
 				al_draw_scaled_bitmap(BMP_RECORDS, 0, 0, al_get_bitmap_width(BMP_RECORDS), al_get_bitmap_height(BMP_RECORDS), constants_to_set_graphics[0][0], constants_to_set_graphics[0][1] + 2*constants_to_set_graphics[0][2], al_get_bitmap_width(BMP_RECORDS)*scale[0], al_get_bitmap_height(BMP_RECORDS)*scale[1], 0);
@@ -1320,8 +1296,6 @@ int main(void) {
 				case 0:  BMP_ONE_PLAYER = al_load_bitmap("wejsciowe/JEDEN_GRACZ_WYBRANE.PNG"); BMP_TWO_PLAYERS = al_load_bitmap("wejsciowe/DWOCH_GRACZY.png"); break;
 				case 1:  BMP_ONE_PLAYER = al_load_bitmap("wejsciowe/JEDEN_GRACZ.PNG"); BMP_TWO_PLAYERS = al_load_bitmap("wejsciowe/DWOCH_GRACZY_WYBRANE.png");  break;
 				}
-				//al_draw_bitmap(BMP_ONE_PLAYER, width / 2 - 300, height / 2 - 40, 0);
-				//al_draw_bitmap(BMP_TWO_PLAYERS, width / 2 - 300, height / 2 + 15, 0);
 				al_draw_scaled_bitmap(BMP_ONE_PLAYER, 0, 0, al_get_bitmap_width(BMP_ONE_PLAYER), al_get_bitmap_height(BMP_ONE_PLAYER), constants_to_set_graphics[1][0], constants_to_set_graphics[0][1] + constants_to_set_graphics[0][2], al_get_bitmap_width(BMP_ONE_PLAYER)*scale[0], al_get_bitmap_height(BMP_ONE_PLAYER)*scale[1], 0);
 				al_draw_scaled_bitmap(BMP_TWO_PLAYERS, 0, 0, al_get_bitmap_width(BMP_TWO_PLAYERS), al_get_bitmap_height(BMP_TWO_PLAYERS), constants_to_set_graphics[1][0], constants_to_set_graphics[0][1] + constants_to_set_graphics[0][2]*2, al_get_bitmap_width(BMP_TWO_PLAYERS)*scale[0], al_get_bitmap_height(BMP_TWO_PLAYERS)*scale[1], 0);
 			}
