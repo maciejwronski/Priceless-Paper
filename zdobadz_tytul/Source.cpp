@@ -19,14 +19,14 @@
 #define SPEED_OF_ENEMIES 5
 #define COOLDOWN_ON_SHOTS 0.6f
 #define MAX_BULLETS 100 // MAX NUMBER OF BULLETS AT THE MAP
-#define MAX_NUMBER_OF_ENEMIES 1
+#define MAX_NUMBER_OF_ENEMIES 5
 #define MAX_NUMBER_OF_ENEMIES_AT_THE_SAME_TIME 4
 #define SPEED_OF_PLAYER 5
 #define COOLDOWN_ON_ENEMIES_DIRECTION 0.4f
 #define COOLDOWN_ON_ENEMIES_SHOTS 0.5f
 #define PROBABILITY_THAT_ENEMY_SHOOTS 400
 #define PROBABILITY_THAT_ENEMY_RESPAWNS 100
-#define PROBABILITY_THAT_BOSS_RESPAWNS 4
+#define PROBABILITY_THAT_BOSS_RESPAWNS 5
 #define POINTS_FOR_ENEMY 100
 #define POINTS_FOR_BOSS 200
 #define SIZE_FONT 30
@@ -66,7 +66,7 @@ int player_lifes[2] = { 1,1 };
 int direction[2] = { -1 };
 float scale[2];
 float DeltaTime = 1.0 / FPS;
-int stage = 1;
+int stage = 3;
 int enemies_killed = 0;
 int enemies_count = 0;
 int global_score = 0;
@@ -306,16 +306,17 @@ void draw_bullets(obiekt bullets[]) {
 }
 void draw_enemies(przeciwnik Przeciwnik[]) {
 	int i;
-	for (i = 0; i < MAX_NUMBER_OF_ENEMIES; i++)
-		if (Przeciwnik[i].alive == 1 && Przeciwnik[i].died == 0) {
-			//al_draw_bitmap(BMP_ENEMY, Przeciwnik[i].x, Przeciwnik[i].y, 0);
-			al_draw_scaled_bitmap(BMP_ENEMY, 0, 0, enemy_size[0], enemy_size[1], Przeciwnik[i].x, Przeciwnik[i].y, enemy_size[0] * scale[0], enemy_size[1] * scale[1], 0);
-			if (Przeciwnik[i].boss == 1) {
-				//al_draw_bitmap(BMP_ENEMY_BOSS, Przeciwnik[i].x, Przeciwnik[i].y, 0);
-				al_draw_scaled_bitmap(BMP_ENEMY_BOSS, 0, 0, enemy_size[0], enemy_size[1], Przeciwnik[i].x, Przeciwnik[i].y, enemy_size[0] * scale[0], enemy_size[1] * scale[1],0);
+	for (i = 0; i < MAX_NUMBER_OF_ENEMIES; i++) {
+		if(Przeciwnik[i].alive && Przeciwnik[i].died == 0){
+			if (Przeciwnik[i].boss == 0) 
+				//al_draw_bitmap(BMP_ENEMY, Przeciwnik[i].x, Przeciwnik[i].y, 0);
+				al_draw_scaled_bitmap(BMP_ENEMY, 0, 0, enemy_size[0], enemy_size[1], Przeciwnik[i].x, Przeciwnik[i].y, enemy_size[0] * scale[0], enemy_size[1] * scale[1], 0);
+				else al_draw_scaled_bitmap(BMP_ENEMY_BOSS, 0, 0, enemy_size[0], enemy_size[1], Przeciwnik[i].x, Przeciwnik[i].y, enemy_size[0] * scale[0], enemy_size[1] * scale[1], 0);
+					//al_draw_bitmap(BMP_ENEMY_BOSS, Przeciwnik[i].x, Przeciwnik[i].y, 0);
+
 			}
 		}
-}
+	}
 przeciwnik Przeciwnik[MAX_NUMBER_OF_ENEMIES];
 
 void draw_stage(int ktory) {
