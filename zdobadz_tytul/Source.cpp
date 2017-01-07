@@ -26,7 +26,7 @@
 #define COOLDOWN_ON_ENEMIES_SHOTS 0.5f
 #define PROBABILITY_THAT_ENEMY_SHOOTS 400
 #define PROBABILITY_THAT_ENEMY_RESPAWNS 100
-#define PROBABILITY_THAT_BOSS_RESPAWNS 1
+#define PROBABILITY_THAT_BOSS_RESPAWNS 4
 #define POINTS_FOR_ENEMY 100
 #define POINTS_FOR_BOSS 200
 #define SIZE_FONT 30
@@ -395,9 +395,9 @@ void draw_stage(int ktory) {
 		BMP_START = al_load_bitmap("mapybmp/pierwsza.png");
 		BMP_TEXTURE_1 = al_load_bitmap("mapybmp/opornik.png");
 		BMP_SYMBOL = al_load_bitmap("mapybmp/II.png");
-		BMP_ENEMY= al_load_bitmap("przeciwnicy/calka.png");
-		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
-		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		BMP_ENEMY= al_load_bitmap("przeciwnicy/fizyk.png");
+		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/fizyk_boss.png");
+		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/fizyk_pocisk.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/4_semestr_koniec.png");
 		enemy_size[0] = al_get_bitmap_width(BMP_ENEMY);
 		enemy_size[1] = al_get_bitmap_height(BMP_ENEMY);
@@ -416,11 +416,11 @@ void draw_stage(int ktory) {
 	}
 	case 5: {
 		BMP_START = al_load_bitmap("mapybmp/pierwsza.png");
-		BMP_TEXTURE_1 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEXTURE_1 = al_load_bitmap("mapybmp/cegla.png");
 		BMP_SYMBOL = al_load_bitmap("mapybmp/II.png");
-		BMP_ENEMY = al_load_bitmap("przeciwnicy/calka.png");
-		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
-		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		BMP_ENEMY = al_load_bitmap("przeciwnicy/budowniczy.png");
+		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/budowniczy_boss.png");
+		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/budowniczy_pocisk.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/5_semestr_koniec.png");
 		enemy_size[0] = al_get_bitmap_width(BMP_ENEMY);
 		enemy_size[1] = al_get_bitmap_height(BMP_ENEMY);
@@ -439,11 +439,11 @@ void draw_stage(int ktory) {
 	}
 	case 6: {
 		BMP_START = al_load_bitmap("mapybmp/pierwsza.png");
-		BMP_TEXTURE_1 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEXTURE_1 = al_load_bitmap("mapybmp/robot.png");
 		BMP_SYMBOL = al_load_bitmap("mapybmp/II.png");
-		BMP_ENEMY = al_load_bitmap("przeciwnicy/calka.png");
-		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
-		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		BMP_ENEMY = al_load_bitmap("przeciwnicy/air.png");
+		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/air_boss.png");
+		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/air_pocisk.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/6_semestr_koniec.png");
 		enemy_size[0] = al_get_bitmap_width(BMP_ENEMY);
 		enemy_size[1] = al_get_bitmap_height(BMP_ENEMY);
@@ -462,11 +462,11 @@ void draw_stage(int ktory) {
 	}
 	case 7: {
 		BMP_START = al_load_bitmap("mapybmp/pierwsza.png");
-		BMP_TEXTURE_1 = al_load_bitmap("mapybmp/fiolka.png");
+		BMP_TEXTURE_1 = al_load_bitmap("mapybmp/dyplomowy.png");
 		BMP_SYMBOL = al_load_bitmap("mapybmp/II.png");
-		BMP_ENEMY = al_load_bitmap("przeciwnicy/calka.png");
-		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
-		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		BMP_ENEMY = al_load_bitmap("przeciwnicy/ostatni.png");
+		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/ostatni_boss.png");
+		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/ostatni_pocisk.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/6_semestr_koniec.png");
 		enemy_size[0] = al_get_bitmap_width(BMP_ENEMY);
 		enemy_size[1] = al_get_bitmap_height(BMP_ENEMY);
@@ -755,7 +755,7 @@ for (i = 0; i < MAX_BULLETS; i++)
 					al_stop_timer(timer_stage);
 					clean_everything();
 					enemies_killed = 0;
-					al_rest(10.0);
+					al_rest(1.0);
 					al_start_timer(timer_stage);
 					draw_stage(++stage);
 				}
