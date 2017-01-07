@@ -19,7 +19,7 @@
 #define SPEED_OF_ENEMIES 5
 #define COOLDOWN_ON_SHOTS 0.6f
 #define MAX_BULLETS 100 // MAX NUMBER OF BULLETS AT THE MAP
-#define MAX_NUMBER_OF_ENEMIES 1
+#define MAX_NUMBER_OF_ENEMIES 20
 #define MAX_NUMBER_OF_ENEMIES_AT_THE_SAME_TIME 4
 #define SPEED_OF_PLAYER 5
 #define COOLDOWN_ON_ENEMIES_DIRECTION 0.4f
@@ -66,7 +66,7 @@ int player_lifes[2] = { 1,1 };
 int direction[2] = { -1 };
 float scale[2];
 float DeltaTime = 1.0 / FPS;
-int stage = 3;
+int stage = 1;
 int enemies_killed = 0;
 int enemies_count = 0;
 int global_score = 0;
@@ -329,6 +329,12 @@ void draw_stage(int ktory) {
 		BMP_ENEMY = al_load_bitmap("przeciwnicy/calka.png");
 		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/calka_boss.png");
 		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/calka_pocisk.png");
+		if (!BMP_START || !BMP_SYMBOL || !BMP_TEXTURE_1 || !BMP_SEMESTER_OVER || !BMP_ENEMY || !BMP_ENEMY_BOSS || !BMP_BULLET_ENEMY) {
+			int error;
+			printf("Semester 1 bitmaps didnt load correctly. Program will exit\nEnter any key to continue");
+			scanf_s("%i", &error);
+			exit(EXIT_FAILURE);
+		}
 		enemy_size[0] = al_get_bitmap_width(BMP_ENEMY);
 		enemy_size[1] = al_get_bitmap_height(BMP_ENEMY);
 		bullets_size_enemy[0] = al_get_bitmap_width(BMP_BULLET_ENEMY);
@@ -337,12 +343,6 @@ void draw_stage(int ktory) {
 		main_screen_size[1] = al_get_bitmap_height(BMP_START);
 		texture_size[0] = al_get_bitmap_width(BMP_TEXTURE_1);
 		texture_size[1] = al_get_bitmap_height(BMP_TEXTURE_1);
-		if (!BMP_START || !BMP_SYMBOL || !BMP_TEXTURE_1 || !BMP_SEMESTER_OVER || !BMP_ENEMY || !BMP_ENEMY_BOSS || !BMP_BULLET_ENEMY) {
-			int error;
-			printf("Semester 1 bitmaps didnt load correctly. Program will exit\nEnter any key to continue");
-			scanf_s("%i", &error);
-			exit(EXIT_FAILURE);
-		}
 		al_flip_display();
 		break;
 	}
@@ -354,18 +354,18 @@ void draw_stage(int ktory) {
 		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/C_boss.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/2_semestr_koniec.png");
 		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/C_pocisk.png");
-		enemy_size[0] = al_get_bitmap_width(BMP_ENEMY);
-		enemy_size[1] = al_get_bitmap_height(BMP_ENEMY);
-		bullets_size_enemy[0] = al_get_bitmap_width(BMP_BULLET_ENEMY);
-		bullets_size_enemy[1] = al_get_bitmap_height(BMP_BULLET_ENEMY);
-		texture_size[0] = al_get_bitmap_width(BMP_TEXTURE_1);
-		texture_size[1] = al_get_bitmap_height(BMP_TEXTURE_1);
 		if (!BMP_START || !BMP_SYMBOL || !BMP_TEXTURE_1 || !BMP_SEMESTER_OVER || !BMP_ENEMY || !BMP_ENEMY_BOSS || !BMP_BULLET_ENEMY) {
 			int error;
 			printf("Semester 2 bitmaps didnt load correctly. Program will exit\nEnter any key to continue");
 			scanf_s("%i", &error);
 			exit(EXIT_FAILURE);
 		}
+		enemy_size[0] = al_get_bitmap_width(BMP_ENEMY);
+		enemy_size[1] = al_get_bitmap_height(BMP_ENEMY);
+		bullets_size_enemy[0] = al_get_bitmap_width(BMP_BULLET_ENEMY);
+		bullets_size_enemy[1] = al_get_bitmap_height(BMP_BULLET_ENEMY);
+		texture_size[0] = al_get_bitmap_width(BMP_TEXTURE_1);
+		texture_size[1] = al_get_bitmap_height(BMP_TEXTURE_1);
 		al_flip_display();
 		break;
 	}
@@ -377,18 +377,18 @@ void draw_stage(int ktory) {
 		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/naukowiec.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/3_semestr_koniec.png");
 		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/fiolka_pocisk.png");
-		enemy_size[0] = al_get_bitmap_width(BMP_ENEMY);
-		enemy_size[1] = al_get_bitmap_height(BMP_ENEMY);
-		bullets_size_enemy[0] = al_get_bitmap_width(BMP_BULLET_ENEMY);
-		bullets_size_enemy[1] = al_get_bitmap_height(BMP_BULLET_ENEMY);
-		texture_size[0] = al_get_bitmap_width(BMP_TEXTURE_1);
-		texture_size[1] = al_get_bitmap_height(BMP_TEXTURE_1);
 		if (!BMP_START || !BMP_SYMBOL || !BMP_TEXTURE_1 || !BMP_SEMESTER_OVER || !BMP_ENEMY || !BMP_ENEMY_BOSS || !BMP_BULLET_ENEMY) {
 			int error;
 			printf("Semester 3 bitmaps didnt load correctly. Program will exit\nEnter any key to continue");
 			scanf_s("%i", &error);
 			exit(EXIT_FAILURE);
 		}
+		enemy_size[0] = al_get_bitmap_width(BMP_ENEMY);
+		enemy_size[1] = al_get_bitmap_height(BMP_ENEMY);
+		bullets_size_enemy[0] = al_get_bitmap_width(BMP_BULLET_ENEMY);
+		bullets_size_enemy[1] = al_get_bitmap_height(BMP_BULLET_ENEMY);
+		texture_size[0] = al_get_bitmap_width(BMP_TEXTURE_1);
+		texture_size[1] = al_get_bitmap_height(BMP_TEXTURE_1);
 		al_flip_display();
 		break;
 	}
@@ -400,18 +400,18 @@ void draw_stage(int ktory) {
 		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/fizyk_boss.png");
 		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/fizyk_pocisk.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/4_semestr_koniec.png");
-		enemy_size[0] = al_get_bitmap_width(BMP_ENEMY);
-		enemy_size[1] = al_get_bitmap_height(BMP_ENEMY);
-		bullets_size_enemy[0] = al_get_bitmap_width(BMP_BULLET_ENEMY);
-		bullets_size_enemy[1] = al_get_bitmap_height(BMP_BULLET_ENEMY);
-		texture_size[0] = al_get_bitmap_width(BMP_TEXTURE_1);
-		texture_size[1] = al_get_bitmap_height(BMP_TEXTURE_1);
 		if (!BMP_START || !BMP_SYMBOL || !BMP_TEXTURE_1 || !BMP_SEMESTER_OVER || !BMP_ENEMY || !BMP_ENEMY_BOSS || !BMP_BULLET_ENEMY) {
 			int error;
 			printf("Semester 4 bitmaps didnt load correctly. Program will exit\nEnter any key to continue");
 			scanf_s("%i", &error);
 			exit(EXIT_FAILURE);
 		}
+		enemy_size[0] = al_get_bitmap_width(BMP_ENEMY);
+		enemy_size[1] = al_get_bitmap_height(BMP_ENEMY);
+		bullets_size_enemy[0] = al_get_bitmap_width(BMP_BULLET_ENEMY);
+		bullets_size_enemy[1] = al_get_bitmap_height(BMP_BULLET_ENEMY);
+		texture_size[0] = al_get_bitmap_width(BMP_TEXTURE_1);
+		texture_size[1] = al_get_bitmap_height(BMP_TEXTURE_1);
 		al_flip_display();
 		break;
 	}
@@ -423,18 +423,18 @@ void draw_stage(int ktory) {
 		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/budowniczy_boss.png");
 		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/budowniczy_pocisk.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/5_semestr_koniec.png");
-		enemy_size[0] = al_get_bitmap_width(BMP_ENEMY);
-		enemy_size[1] = al_get_bitmap_height(BMP_ENEMY);
-		bullets_size_enemy[0] = al_get_bitmap_width(BMP_BULLET_ENEMY);
-		bullets_size_enemy[1] = al_get_bitmap_height(BMP_BULLET_ENEMY);
-		texture_size[0] = al_get_bitmap_width(BMP_TEXTURE_1);
-		texture_size[1] = al_get_bitmap_height(BMP_TEXTURE_1);
 		if (!BMP_START || !BMP_SYMBOL || !BMP_TEXTURE_1 || !BMP_SEMESTER_OVER || !BMP_ENEMY || !BMP_ENEMY_BOSS || !BMP_BULLET_ENEMY) {
 			int error;
 			printf("Semester 5 bitmaps didnt load correctly. Program will exit\nEnter any key to continue");
 			scanf_s("%i", &error);
 			exit(EXIT_FAILURE);
 		}
+		enemy_size[0] = al_get_bitmap_width(BMP_ENEMY);
+		enemy_size[1] = al_get_bitmap_height(BMP_ENEMY);
+		bullets_size_enemy[0] = al_get_bitmap_width(BMP_BULLET_ENEMY);
+		bullets_size_enemy[1] = al_get_bitmap_height(BMP_BULLET_ENEMY);
+		texture_size[0] = al_get_bitmap_width(BMP_TEXTURE_1);
+		texture_size[1] = al_get_bitmap_height(BMP_TEXTURE_1);
 		al_flip_display();
 		break;
 	}
@@ -446,18 +446,18 @@ void draw_stage(int ktory) {
 		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/air_boss.png");
 		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/air_pocisk.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/6_semestr_koniec.png");
-		enemy_size[0] = al_get_bitmap_width(BMP_ENEMY);
-		enemy_size[1] = al_get_bitmap_height(BMP_ENEMY);
-		bullets_size_enemy[0] = al_get_bitmap_width(BMP_BULLET_ENEMY);
-		bullets_size_enemy[1] = al_get_bitmap_height(BMP_BULLET_ENEMY);
-		texture_size[0] = al_get_bitmap_width(BMP_TEXTURE_1);
-		texture_size[1] = al_get_bitmap_height(BMP_TEXTURE_1);
 		if (!BMP_START || !BMP_SYMBOL || !BMP_TEXTURE_1 || !BMP_SEMESTER_OVER || !BMP_ENEMY || !BMP_ENEMY_BOSS || !BMP_BULLET_ENEMY) {
 			int error;
 			printf("Semester 6 bitmaps didnt load correctly. Program will exit\nEnter any key to continue");
 			scanf_s("%i", &error);
 			exit(EXIT_FAILURE);
 		}
+		enemy_size[0] = al_get_bitmap_width(BMP_ENEMY);
+		enemy_size[1] = al_get_bitmap_height(BMP_ENEMY);
+		bullets_size_enemy[0] = al_get_bitmap_width(BMP_BULLET_ENEMY);
+		bullets_size_enemy[1] = al_get_bitmap_height(BMP_BULLET_ENEMY);
+		texture_size[0] = al_get_bitmap_width(BMP_TEXTURE_1);
+		texture_size[1] = al_get_bitmap_height(BMP_TEXTURE_1);
 		al_flip_display();
 		break;
 	}
@@ -469,18 +469,18 @@ void draw_stage(int ktory) {
 		BMP_ENEMY_BOSS = al_load_bitmap("przeciwnicy/ostatni_boss.png");
 		BMP_BULLET_ENEMY = al_load_bitmap("przeciwnicy/ostatni_pocisk.png");
 		BMP_SEMESTER_OVER = al_load_bitmap("mapybmp/6_semestr_koniec.png");
-		enemy_size[0] = al_get_bitmap_width(BMP_ENEMY);
-		enemy_size[1] = al_get_bitmap_height(BMP_ENEMY);
-		bullets_size_enemy[0] = al_get_bitmap_width(BMP_BULLET_ENEMY);
-		bullets_size_enemy[1] = al_get_bitmap_height(BMP_BULLET_ENEMY);
-		texture_size[0] = al_get_bitmap_width(BMP_TEXTURE_1);
-		texture_size[1] = al_get_bitmap_height(BMP_TEXTURE_1);
 		if (!BMP_START || !BMP_SYMBOL || !BMP_TEXTURE_1 || !BMP_SEMESTER_OVER || !BMP_ENEMY || !BMP_ENEMY_BOSS || !BMP_BULLET_ENEMY) {
 			int error;
 			printf("Semester 7 bitmaps didnt load correctly. Program will exit\nEnter any key to continue");
 			scanf_s("%i", &error);
 			exit(EXIT_FAILURE);
 		}
+		enemy_size[0] = al_get_bitmap_width(BMP_ENEMY);
+		enemy_size[1] = al_get_bitmap_height(BMP_ENEMY);
+		bullets_size_enemy[0] = al_get_bitmap_width(BMP_BULLET_ENEMY);
+		bullets_size_enemy[1] = al_get_bitmap_height(BMP_BULLET_ENEMY);
+		texture_size[0] = al_get_bitmap_width(BMP_TEXTURE_1);
+		texture_size[1] = al_get_bitmap_height(BMP_TEXTURE_1);
 		al_flip_display();
 		break;
 	}
@@ -665,368 +665,382 @@ void pre_start_game() {
 		}
 		else if (ev.type == ALLEGRO_EVENT_TIMER) {
 			//al_draw_bitmap(BMP_START, 0, 0, 0);
-			al_draw_scaled_bitmap(BMP_START, 0, 0, al_get_bitmap_width(BMP_START), al_get_bitmap_height(BMP_START), 0, 0, al_get_bitmap_width(BMP_START)*scale[0], al_get_bitmap_height(BMP_START)*scale[1],0);
+			al_draw_scaled_bitmap(BMP_START, 0, 0, al_get_bitmap_width(BMP_START), al_get_bitmap_height(BMP_START), 0, 0, al_get_bitmap_width(BMP_START)*scale[0], al_get_bitmap_height(BMP_START)*scale[1], 0);
 			//al_draw_bitmap(BMP_SYMBOL, SYMBOL[0], SYMBOL[1], 0);
 			al_draw_scaled_bitmap(BMP_SYMBOL, 0, 0, width_symbol, height_symbol, SYMBOL[0], SYMBOL[1], width_symbol*scale[0], height_symbol*scale[1], 0);
-for (i = 0; i < MAX_NUMBER_OF_ENEMIES; i++)
-{
-	if (Przeciwnik[i].alive)
-	{
-		int random_x[MAX_NUMBER_OF_ENEMIES];
-		int random_y[MAX_NUMBER_OF_ENEMIES];
-		int losowa[MAX_NUMBER_OF_ENEMIES];
-		if (enemy_timer_cooldown[0][i] <= 0 && !frozen) {
-			losowa[i] = rand() % 4;
-			enemy_timer_cooldown[0][i] = COOLDOWN_ON_ENEMIES_DIRECTION;
-			random_x[i] = rand() % SPEED_OF_ENEMIES;
-			random_y[i] = rand() % SPEED_OF_ENEMIES;
-		}
-		if (enemy_timer_cooldown[1][i] <= 0 && rand() % PROBABILITY_THAT_ENEMY_SHOOTS == 0) {
-			temp = add_bullet(Przeciwnik[i].x, Przeciwnik[i].y + 20, direction[0], 1);
-			bullets[temp].alive = 1;
-			enemy_timer_cooldown[1][i] = COOLDOWN_ON_ENEMIES_SHOTS;
-		}
-		last_pos_comp[i][0] = Przeciwnik[i].x;
-		last_pos_comp[i][1] = Przeciwnik[i].y;
-		switch (losowa[i]) {
-		case 0: Przeciwnik[i].x += random_x[i]; break;
-		case 1: Przeciwnik[i].y += random_y[i]; break;
-		case 2: Przeciwnik[i].x -= random_x[i]; break;
-		case 3:Przeciwnik[i].y -= random_y[i]; break;
-		}
-		for (int t = 0; t < 11; t++) {
-			for (int z = 0; z < 28; z++) {
-				if (objMap[t][z] == 1 && collision(Przeciwnik[i].x, enemy_size[0], z * 48*scale[0], texture_size[0], Przeciwnik[i].y, enemy_size[1], t * 70*scale[1], texture_size[1])) {
-					Przeciwnik[i].x = last_pos_comp[i][0];
-					Przeciwnik[i].y = last_pos_comp[i][1];
-				}
-			}
-		}
-		if (Przeciwnik[i].x < 0) { Przeciwnik[i].x = 0; enemy_timer_cooldown[0][i] = -1.0f; }
-		if (Przeciwnik[i].y < 0) { Przeciwnik[i].y = 0; enemy_timer_cooldown[0][i] = -1.0f; }
-		if (Przeciwnik[i].y + enemy_size[1] >= height) { Przeciwnik[i].y = height - enemy_size[1];  enemy_timer_cooldown[0][i] = -1.0f; }
-		if (Przeciwnik[i].x + enemy_size[0] >= width) {
-			Przeciwnik[i].x = width - enemy_size[0]; enemy_timer_cooldown[0][i] = -1.0f;
-		}
-		if (collision(Przeciwnik[i].x, enemy_size[0], SYMBOL[0], width_symbol,Przeciwnik[i].y, enemy_size[1], SYMBOL[1], height_symbol)) {
-			Przeciwnik[i].x = last_pos_comp[i][0];
-			Przeciwnik[i].y = last_pos_comp[i][1];
-		}
-		if (collision(Przeciwnik[i].x, enemy_size[0], pos_player[0][0], width_character, Przeciwnik[i].y, enemy_size[1], pos_player[0][1], height_character)) {
-			Przeciwnik[i].x = last_pos_comp[i][0];
-			Przeciwnik[i].y = last_pos_comp[i][1];
-			pos_player[0][0] = last_pos_player[0][0];
-			pos_player[0][1] = last_pos_player[0][1];
-		}
-		if (collision(Przeciwnik[i].x, enemy_size[0], pos_player[1][0], width_character, Przeciwnik[i].y, enemy_size[1], pos_player[1][1], height_character)) {
-			Przeciwnik[i].x = last_pos_comp[i][0];
-			Przeciwnik[i].y = last_pos_comp[i][1];
-			pos_player[1][0] = last_pos_player[1][0];
-			pos_player[1][1] = last_pos_player[1][1];
-		}
-	}
-}
-
-for (i = 0; i < MAX_BULLETS; i++)
-{
-	if (bullets[i].alive)
-	{
-		if (bullets[i].x < 0 || bullets[i].y < 0 || bullets[i].x > width || bullets[i].y > height)
-			bullets[i].alive = 0;
-		for (int j = 0; j < MAX_NUMBER_OF_ENEMIES; j++) {
-			if (bullets[i].whose != 1 && Przeciwnik[j].died == 0 && Przeciwnik[j].alive && collision(bullets[i].x, bullets_size[0], Przeciwnik[j].x, enemy_size[0],bullets[i].y, bullets_size[1], Przeciwnik[j].y, enemy_size[1])) {
-				bullets[i].alive = 0;
-				if (--Przeciwnik[j].lifes == 0) {
-					if (Przeciwnik[j].boss) {
-						Przeciwnik[j].boss = 0;
-						global_score += POINTS_FOR_BOSS;
-						temp = create_bonus(Bonus, Przeciwnik[j].x, Przeciwnik[j].y);
-						Bonus[temp].alive = 1;
+			for (i = 0; i < MAX_NUMBER_OF_ENEMIES; i++) {
+				if (Przeciwnik[i].alive) {
+					int random_x[MAX_NUMBER_OF_ENEMIES];
+					int random_y[MAX_NUMBER_OF_ENEMIES];
+					int losowa[MAX_NUMBER_OF_ENEMIES];
+					if (enemy_timer_cooldown[0][i] <= 0 && !frozen) {
+						losowa[i] = rand() % 4;
+						enemy_timer_cooldown[0][i] = COOLDOWN_ON_ENEMIES_DIRECTION;
+						random_x[i] = rand() % SPEED_OF_ENEMIES;
+						random_y[i] = rand() % SPEED_OF_ENEMIES;
 					}
-					else global_score += POINTS_FOR_ENEMY;
-					Przeciwnik[j].alive = 0;
-					Przeciwnik[j].died = 1;
-					enemies_killed++;
-					enemies_count--;
-				}
-				if (enemies_killed >= MAX_NUMBER_OF_ENEMIES) {
-					al_draw_bitmap(BMP_START, 0, 0, 0);
-					al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
-					al_flip_display();
-					al_stop_timer(timer_stage);
-					clean_everything();
-					enemies_killed = 0;
-					al_rest(1.0);
-					al_start_timer(timer_stage);
-					draw_stage(++stage);
-				}
-			}
-		}
-		if (!immunity[0] && bullets[i].whose == 1 && collision(bullets[i].x, bullets_size[0], pos_player[0][0], width_character, bullets[i].y, bullets_size[1], pos_player[0][1], height_character) && player_lifes[0] == 1) {
-			bullets[i].alive = 0;
-			player_lifes[0] = 0;
-			player_alive[0] = false;
-			pos_player[0][0] = -100;
-			pos_player[0][1] = -100;
-		}
-		if (!immunity[0] && bullets[i].whose == 1 && collision(bullets[i].x, bullets_size[0], pos_player[0][0], width_character, bullets[i].y, bullets_size[1], pos_player[0][1], height_character) && player_lifes[0] > 1){
-		pos_player[0][0] = width / 2 - 100;
-		pos_player[0][1] = height - 80;
-		player_lifes[0]--;
-		}
-		if (!immunity[1] && bullets[i].whose == 1 && collision(bullets[i].x, bullets_size[0], pos_player[1][0], width_character, bullets[i].y, bullets_size[1], pos_player[1][1], height_character) && player_lifes[1] == 1) {
-			bullets[i].alive = 0;
-			player_lifes[1] = 0;
-			player_alive[1] = false;
-			pos_player[1][0] = -100;
-			pos_player[1][1] = -100;
-		}
-		if (!immunity[1] && bullets[i].whose == 1 && collision(bullets[i].x, bullets_size[0], pos_player[0][0], width_character, bullets[i].y, bullets_size[1], pos_player[0][1], height_character) && player_lifes[1] > 1) {
-			pos_player[1][0] = width / 2 - 100;
-			pos_player[1][1] = height - 80;
-			player_lifes[1]--;
-		}
-		for (int t = 0; t <11; t++) {
-			for (int z = 0; z < 28; z++) {
-				if (objMap[t][z] == 1 && collision(bullets[i].x, bullets_size[0], z * 48*scale[0], texture_size[0], bullets[i].y, bullets_size[1], t * 70*scale[1], texture_size[1])) {
-					bullets[i].alive = 0;
-					objMap[t][z] = 0;
-				}
-			}
-		}
-					if (collision(bullets[i].x, bullets_size[0], SYMBOL[0], width_symbol, bullets[i].y, bullets_size[1], SYMBOL[1], height_symbol)) {
-						bullets[i].alive = 0;
-						in_game = false;
+					if (enemy_timer_cooldown[1][i] <= 0 && rand() % PROBABILITY_THAT_ENEMY_SHOOTS == 0) {
+						temp = add_bullet(Przeciwnik[i].x, Przeciwnik[i].y + 20, direction[0], 1);
+						bullets[temp].alive = 1;
+						enemy_timer_cooldown[1][i] = COOLDOWN_ON_ENEMIES_SHOTS;
 					}
-				}
-			}
-			last_pos_player[0][0] = pos_player[0][0];
-			last_pos_player[0][1] = pos_player[0][1];
-			last_pos_player[1][0] = pos_player[1][0];
-			last_pos_player[1][1] = pos_player[1][1];
-			if (player_alive[0]) {
-				pos_player[0][1] -= keys[UP] * SPEED_OF_PLAYER;
-				pos_player[0][1] += keys[DOWN] * SPEED_OF_PLAYER;
-				pos_player[0][0] -= keys[LEFT] * SPEED_OF_PLAYER;
-				pos_player[0][0] += keys[RIGHT] * SPEED_OF_PLAYER;
-			}
-			if (number_of_players[1] == true && player_alive[1]) {
-				pos_player[1][1] -= keys1[W] * SPEED_OF_PLAYER;
-				pos_player[1][1] += keys1[S] * SPEED_OF_PLAYER;
-				pos_player[1][0] -= keys1[A] * SPEED_OF_PLAYER;
-				pos_player[1][0] += keys1[D] * SPEED_OF_PLAYER;
-			}
-			if (player_alive[0] && player_alive[1] && collision(pos_player[0][0], width_character, pos_player[1][0], width_character, pos_player[0][1], height_character, pos_player[1][1], height_character)){
-				pos_player[0][0] = last_pos_player[0][0];
-				pos_player[0][1] = last_pos_player[0][1];
-				pos_player[1][0] = last_pos_player[1][0];
-				pos_player[1][1] = last_pos_player[1][1];
-			}
-			if (player_alive[0]) {
-				for (int t = 0; t < 11; t++) {
-					for (int i = 0; i < 28; i++) {
-						if (objMap[t][i] == 1 && collision(pos_player[0][0], width_character, i * 48*scale[0], texture_size[0], pos_player[0][1], height_character, t * 70*scale[1], texture_size[1])) {
+					last_pos_comp[i][0] = Przeciwnik[i].x;
+					last_pos_comp[i][1] = Przeciwnik[i].y;
+					switch (losowa[i]) {
+					case 0: Przeciwnik[i].x += random_x[i]; break;
+					case 1: Przeciwnik[i].y += random_y[i]; break;
+					case 2: Przeciwnik[i].x -= random_x[i]; break;
+					case 3:Przeciwnik[i].y -= random_y[i]; break;
+					}
+					for (int t = 0; t < 11; t++) {
+						for (int z = 0; z < 28; z++) {
+							if (objMap[t][z] == 1 && collision(Przeciwnik[i].x, enemy_size[0], z * 48 * scale[0], texture_size[0], Przeciwnik[i].y, enemy_size[1], t * 70 * scale[1], texture_size[1])) {
+								Przeciwnik[i].x = last_pos_comp[i][0];
+								Przeciwnik[i].y = last_pos_comp[i][1];
+							}
+						}
+					}
+					for (int n = 0; n < MAX_NUMBER_OF_ENEMIES; n++) {
+						if (Przeciwnik[n].alive && i != n && collision(Przeciwnik[i].x, enemy_size[0], Przeciwnik[n].x, enemy_size[0], Przeciwnik[i].y, enemy_size[1], Przeciwnik[n].y, enemy_size[1])) {
+							Przeciwnik[i].x = last_pos_comp[i][0];
+							Przeciwnik[i].y = last_pos_comp[i][1];
+							Przeciwnik[n].x = last_pos_comp[n][0];
+							Przeciwnik[n].y = last_pos_comp[n][1];
+						}
+					}
+						if (Przeciwnik[i].x < 0) { Przeciwnik[i].x = 0; enemy_timer_cooldown[0][i] = -1.0f; }
+						if (Przeciwnik[i].y < 0) { Przeciwnik[i].y = 0; enemy_timer_cooldown[0][i] = -1.0f; }
+						if (Przeciwnik[i].y + enemy_size[1] >= height) { Przeciwnik[i].y = height - enemy_size[1];  enemy_timer_cooldown[0][i] = -1.0f; }
+						if (Przeciwnik[i].x + enemy_size[0] >= width) {
+							Przeciwnik[i].x = width - enemy_size[0]; enemy_timer_cooldown[0][i] = -1.0f;
+						}
+						if (collision(Przeciwnik[i].x, enemy_size[0], SYMBOL[0], width_symbol, Przeciwnik[i].y, enemy_size[1], SYMBOL[1], height_symbol)) {
+							Przeciwnik[i].x = last_pos_comp[i][0];
+							Przeciwnik[i].y = last_pos_comp[i][1];
+						}
+						if (collision(Przeciwnik[i].x, enemy_size[0], pos_player[0][0], width_character, Przeciwnik[i].y, enemy_size[1], pos_player[0][1], height_character)) {
+							Przeciwnik[i].x = last_pos_comp[i][0];
+							Przeciwnik[i].y = last_pos_comp[i][1];
 							pos_player[0][0] = last_pos_player[0][0];
 							pos_player[0][1] = last_pos_player[0][1];
 						}
-					}
-				}
-				if (pos_player[0][1] <= 0) pos_player[0][1] = 0;
-				if (pos_player[0][0] <= 0) pos_player[0][0] = 0;
-				if (pos_player[0][1] + height_character >= height) pos_player[0][1] = height - height_character;
-				if (pos_player[0][0] + width_character >= width) pos_player[0][0] = width - width_character;
-				if (collision(pos_player[0][0], width_character, SYMBOL[0], width_symbol, pos_player[0][1], height_character, SYMBOL[1], height_symbol)) {
-					pos_player[0][0] = last_pos_player[0][0];
-					pos_player[0][1] = last_pos_player[0][1];
-				}
-				for (int i = 0; i < MAX_BONUS; i++) {
-					if (Bonus[i].alive && collision(pos_player[0][0], width_character, Bonus[i].x, Bonus[i].width, pos_player[0][1], height_character, Bonus[i].y, Bonus[i].height)) {
-						switch (Bonus[i].type) {
-						case 0: {
-							if (player_timer_cooldown[2] <= 0) {
-								immunity[0] = true;
-								player_timer_cooldown[2] = TIME_OF_BEEING_UNDEAD;
-							}
-							Bonus[i].alive = 0;
-							break;
-						}
-						case 1: {
-							for (int j = 0; j < MAX_NUMBER_OF_ENEMIES; j++) {
-								if (Przeciwnik[j].alive == 1 && Przeciwnik[j].died == 0) {
-									Przeciwnik[j].alive = 0;
-									Przeciwnik[j].died = 1;
-									Przeciwnik[j].lifes = 0;
-									Przeciwnik[j].boss = 0;
-									Bonus[i].alive = 0;
-									enemies_killed++;
-									enemies_count--;
-								}
-							}
-							if (enemies_killed == MAX_NUMBER_OF_ENEMIES) {
-								al_draw_bitmap(BMP_START, 0, 0, 0);
-								al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
-								al_flip_display();
-								al_stop_timer(timer_stage);
-								clean_everything();
-								enemies_killed = 0;
-								al_rest(10.0);
-								al_start_timer(timer_stage);
-								draw_stage(++stage);
-							}
-							break;
-						}
-						case 2: {
-							if (freeze_time <= 0 ) {
-								frozen = true;
-								freeze_time = FREEZE_ON_ENEMIES;
-							}
-							Bonus[i].alive = 0;
-							break;
-						}
-						case 3: {
-							Bonus[i].alive = 0;
-							player_lifes[0]++;
-							break;
-						}
-						case 4: {
-							Bonus[i].alive = 0;
-								for (int i = 13; i <= 15; i++) {
-									if (objMap[9][i] == 0)
-										objMap[9][i] = 1;
-							}
-								if (objMap[10][13] == 0)
-									objMap[10][13] = 1;
-								if (objMap[10][15] == 0)
-									objMap[10][15] = 1;
-							break;
-						}
-						}
-					}
-				}
-			}
-			if (number_of_players[1] == true && player_alive[1]) {
-				for (int t = 0; t <11; t++) {
-					for (int i = 0; i < 28; i++) {
-						if (objMap[t][i] == 1 && collision(pos_player[1][0], width_character, i * 48*scale[0], texture_size[0], pos_player[1][1], height_character, t * 70*scale[1], texture_size[1])) {
+						if (collision(Przeciwnik[i].x, enemy_size[0], pos_player[1][0], width_character, Przeciwnik[i].y, enemy_size[1], pos_player[1][1], height_character)) {
+							Przeciwnik[i].x = last_pos_comp[i][0];
+							Przeciwnik[i].y = last_pos_comp[i][1];
 							pos_player[1][0] = last_pos_player[1][0];
 							pos_player[1][1] = last_pos_player[1][1];
 						}
 					}
 				}
 
-			if (pos_player[1][1] <= 0) pos_player[1][1] = 0;
-			if (pos_player[1][0] <= 0) pos_player[1][0] = 0;
-				if (pos_player[1][1] + height_character >= height) pos_player[1][1] = height - height_character;
-				if (pos_player[1][0] + width_character >= width) pos_player[1][0] = width - width_character;
-				if (collision(pos_player[1][0], width_character, SYMBOL[0], width_symbol, pos_player[1][1], height_character, SYMBOL[1], height_symbol)) {
-					pos_player[1][0] = last_pos_player[1][0];
-					pos_player[1][1] = last_pos_player[1][1];
-				}
-				for (int i = 0; i < MAX_BONUS; i++) {
-					if (Bonus[i].alive && collision(pos_player[1][0], width_character, Bonus[i].x, Bonus[i].width, pos_player[1][1], height_character, Bonus[i].y, Bonus[i].height)) {
-						switch (Bonus[i].type) {
-						case 0: {
-							if (player_timer_cooldown[3] <= 0) {
-								immunity[1] = true;
-								player_timer_cooldown[3] = TIME_OF_BEEING_UNDEAD;
+				for (i = 0; i < MAX_BULLETS; i++) {
+					if (bullets[i].alive) {
+						if (bullets[i].x < 0 || bullets[i].y < 0 || bullets[i].x > width || bullets[i].y > height)
+							bullets[i].alive = 0;
+						for (int n = 0; n < MAX_BULLETS; n++) {
+							if (bullets[n].alive && (bullets[i].whose == 0 || bullets[n].whose == 0 || bullets[i].whose == 2 || bullets[n].whose == 2) && n != i && collision(bullets[i].x, bullets_size[0], bullets[n].x, bullets_size_enemy[0], bullets[i].y, bullets_size[1], bullets[n].y, bullets_size_enemy[1])) {
+								bullets[i].alive = 0;
+								bullets[n].alive = 0;
 							}
-							Bonus[i].alive = 0;
-							break;
+							if (bullets[n].alive && bullets[i].whose == 1 && bullets[n].whose == 1 && n != i && collision(bullets[i].x, bullets_size_enemy[0], bullets[n].x, bullets_size_enemy[0], bullets[i].y, bullets_size_enemy[1], bullets[n].y, bullets_size_enemy[1])) {
+								bullets[i].alive = 0;
+								bullets[n].alive = 0;
+							}
 						}
-						case 1: {
-							for (int j = 0; j < MAX_NUMBER_OF_ENEMIES; j++) {
-								if (Przeciwnik[j].alive == 1 && Przeciwnik[j].died == 0) {
+						for (int j = 0; j < MAX_NUMBER_OF_ENEMIES; j++) {
+							if (bullets[i].whose != 1 && Przeciwnik[j].died == 0 && Przeciwnik[j].alive && collision(bullets[i].x, bullets_size[0], Przeciwnik[j].x, enemy_size[0], bullets[i].y, bullets_size[1], Przeciwnik[j].y, enemy_size[1])) {
+								bullets[i].alive = 0;
+								if (--Przeciwnik[j].lifes == 0) {
+									if (Przeciwnik[j].boss) {
+										Przeciwnik[j].boss = 0;
+										global_score += POINTS_FOR_BOSS;
+										temp = create_bonus(Bonus, Przeciwnik[j].x, Przeciwnik[j].y);
+										Bonus[temp].alive = 1;
+									}
+									else global_score += POINTS_FOR_ENEMY;
 									Przeciwnik[j].alive = 0;
 									Przeciwnik[j].died = 1;
-									Przeciwnik[j].lifes = 0;
-									Przeciwnik[j].boss = 0;
-									Bonus[i].alive = 0;
 									enemies_killed++;
 									enemies_count--;
-										}
-									}
-							if (enemies_killed == MAX_NUMBER_OF_ENEMIES) {
-								al_draw_bitmap(BMP_START, 0, 0, 0);
-								al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
-								al_flip_display();
-								al_stop_timer(timer_stage);
-								clean_everything();
-								enemies_killed = 0;
-								al_rest(10.0);
-								al_start_timer(timer_stage);
-								draw_stage(++stage);
+								}
+								if (enemies_killed >= MAX_NUMBER_OF_ENEMIES) {
+									al_draw_bitmap(BMP_START, 0, 0, 0);
+									al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
+									al_flip_display();
+									al_stop_timer(timer_stage);
+									clean_everything();
+									enemies_killed = 0;
+									al_rest(1.0);
+									al_start_timer(timer_stage);
+									draw_stage(++stage);
+								}
 							}
-								break;
-							}
-						case 2: {
-							if (freeze_time <= 0) {
-								frozen = true;
-								freeze_time = FREEZE_ON_ENEMIES;
-							}
-							Bonus[i].alive = 0;
-							break;
 						}
-						case 3: {
-							Bonus[i].alive = 0;
-							player_lifes[1]++;
-							break;
+						if (!immunity[0] && bullets[i].whose == 1 && collision(bullets[i].x, bullets_size[0], pos_player[0][0], width_character, bullets[i].y, bullets_size[1], pos_player[0][1], height_character) && player_lifes[0] == 1) {
+							bullets[i].alive = 0;
+							player_lifes[0] = 0;
+							player_alive[0] = false;
+							pos_player[0][0] = -100;
+							pos_player[0][1] = -100;
 						}
-						case 4: {
-							Bonus[i].alive = 0;
-							for (int i = 13; i <= 15; i++) {
-								if (objMap[9][i] == 0)
-									objMap[9][i] = 1;
+						if (!immunity[0] && bullets[i].whose == 1 && collision(bullets[i].x, bullets_size[0], pos_player[0][0], width_character, bullets[i].y, bullets_size[1], pos_player[0][1], height_character) && player_lifes[0] > 1) {
+							pos_player[0][0] = width / 2 - 100;
+							pos_player[0][1] = height - 80;
+							player_lifes[0]--;
+						}
+						if (!immunity[1] && bullets[i].whose == 1 && collision(bullets[i].x, bullets_size[0], pos_player[1][0], width_character, bullets[i].y, bullets_size[1], pos_player[1][1], height_character) && player_lifes[1] == 1) {
+							bullets[i].alive = 0;
+							player_lifes[1] = 0;
+							player_alive[1] = false;
+							pos_player[1][0] = -100;
+							pos_player[1][1] = -100;
+						}
+						if (!immunity[1] && bullets[i].whose == 1 && collision(bullets[i].x, bullets_size[0], pos_player[0][0], width_character, bullets[i].y, bullets_size[1], pos_player[0][1], height_character) && player_lifes[1] > 1) {
+							pos_player[1][0] = width / 2 - 100;
+							pos_player[1][1] = height - 80;
+							player_lifes[1]--;
+						}
+						for (int t = 0; t < 11; t++) {
+							for (int z = 0; z < 28; z++) {
+								if (objMap[t][z] == 1 && collision(bullets[i].x, bullets_size[0], z * 48 * scale[0], texture_size[0], bullets[i].y, bullets_size[1], t * 70 * scale[1], texture_size[1])) {
+									bullets[i].alive = 0;
+									objMap[t][z] = 0;
+								}
 							}
-							if (objMap[10][13] == 0)
-								objMap[10][13] = 1;
-							if (objMap[10][15] == 0)
-								objMap[10][15] = 1;
-							break;
 						}
+						if (collision(bullets[i].x, bullets_size[0], SYMBOL[0], width_symbol, bullets[i].y, bullets_size[1], SYMBOL[1], height_symbol)) {
+							bullets[i].alive = 0;
+							in_game = false;
 						}
 					}
 				}
-			}
+				last_pos_player[0][0] = pos_player[0][0];
+				last_pos_player[0][1] = pos_player[0][1];
+				last_pos_player[1][0] = pos_player[1][0];
+				last_pos_player[1][1] = pos_player[1][1];
+				if (player_alive[0]) {
+					pos_player[0][1] -= keys[UP] * SPEED_OF_PLAYER;
+					pos_player[0][1] += keys[DOWN] * SPEED_OF_PLAYER;
+					pos_player[0][0] -= keys[LEFT] * SPEED_OF_PLAYER;
+					pos_player[0][0] += keys[RIGHT] * SPEED_OF_PLAYER;
+				}
+				if (number_of_players[1] == true && player_alive[1]) {
+					pos_player[1][1] -= keys1[W] * SPEED_OF_PLAYER;
+					pos_player[1][1] += keys1[S] * SPEED_OF_PLAYER;
+					pos_player[1][0] -= keys1[A] * SPEED_OF_PLAYER;
+					pos_player[1][0] += keys1[D] * SPEED_OF_PLAYER;
+				}
+				if (player_alive[0] && player_alive[1] && collision(pos_player[0][0], width_character, pos_player[1][0], width_character, pos_player[0][1], height_character, pos_player[1][1], height_character)) {
+					pos_player[0][0] = last_pos_player[0][0];
+					pos_player[0][1] = last_pos_player[0][1];
+					pos_player[1][0] = last_pos_player[1][0];
+					pos_player[1][1] = last_pos_player[1][1];
+				}
+				if (player_alive[0]) {
+					for (int t = 0; t < 11; t++) {
+						for (int i = 0; i < 28; i++) {
+							if (objMap[t][i] == 1 && collision(pos_player[0][0], width_character, i * 48 * scale[0], texture_size[0], pos_player[0][1], height_character, t * 70 * scale[1], texture_size[1])) {
+								pos_player[0][0] = last_pos_player[0][0];
+								pos_player[0][1] = last_pos_player[0][1];
+							}
+						}
+					}
+					if (pos_player[0][1] <= 0) pos_player[0][1] = 0;
+					if (pos_player[0][0] <= 0) pos_player[0][0] = 0;
+					if (pos_player[0][1] + height_character >= height) pos_player[0][1] = height - height_character;
+					if (pos_player[0][0] + width_character >= width) pos_player[0][0] = width - width_character;
+					if (collision(pos_player[0][0], width_character, SYMBOL[0], width_symbol, pos_player[0][1], height_character, SYMBOL[1], height_symbol)) {
+						pos_player[0][0] = last_pos_player[0][0];
+						pos_player[0][1] = last_pos_player[0][1];
+					}
+					for (int i = 0; i < MAX_BONUS; i++) {
+						if (Bonus[i].alive && collision(pos_player[0][0], width_character, Bonus[i].x, Bonus[i].width, pos_player[0][1], height_character, Bonus[i].y, Bonus[i].height)) {
+							switch (Bonus[i].type) {
+							case 0: {
+								if (player_timer_cooldown[2] <= 0) {
+									immunity[0] = true;
+									player_timer_cooldown[2] = TIME_OF_BEEING_UNDEAD;
+								}
+								Bonus[i].alive = 0;
+								break;
+							}
+							case 1: {
+								for (int j = 0; j < MAX_NUMBER_OF_ENEMIES; j++) {
+									if (Przeciwnik[j].alive == 1 && Przeciwnik[j].died == 0) {
+										Przeciwnik[j].alive = 0;
+										Przeciwnik[j].died = 1;
+										Przeciwnik[j].lifes = 0;
+										Przeciwnik[j].boss = 0;
+										Bonus[i].alive = 0;
+										enemies_killed++;
+										enemies_count--;
+									}
+								}
+								if (enemies_killed == MAX_NUMBER_OF_ENEMIES) {
+									al_draw_bitmap(BMP_START, 0, 0, 0);
+									al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
+									al_flip_display();
+									al_stop_timer(timer_stage);
+									clean_everything();
+									enemies_killed = 0;
+									al_rest(10.0);
+									al_start_timer(timer_stage);
+									draw_stage(++stage);
+								}
+								break;
+							}
+							case 2: {
+								if (freeze_time <= 0) {
+									frozen = true;
+									freeze_time = FREEZE_ON_ENEMIES;
+								}
+								Bonus[i].alive = 0;
+								break;
+							}
+							case 3: {
+								Bonus[i].alive = 0;
+								player_lifes[0]++;
+								break;
+							}
+							case 4: {
+								Bonus[i].alive = 0;
+								for (int i = 13; i <= 15; i++) {
+									if (objMap[9][i] == 0)
+										objMap[9][i] = 1;
+								}
+								if (objMap[10][13] == 0)
+									objMap[10][13] = 1;
+								if (objMap[10][15] == 0)
+									objMap[10][15] = 1;
+								break;
+							}
+							}
+						}
+					}
+				}
+				if (number_of_players[1] == true && player_alive[1]) {
+					for (int t = 0; t < 11; t++) {
+						for (int i = 0; i < 28; i++) {
+							if (objMap[t][i] == 1 && collision(pos_player[1][0], width_character, i * 48 * scale[0], texture_size[0], pos_player[1][1], height_character, t * 70 * scale[1], texture_size[1])) {
+								pos_player[1][0] = last_pos_player[1][0];
+								pos_player[1][1] = last_pos_player[1][1];
+							}
+						}
+					}
 
-			switch (direction[0]) {
-			//case 0:al_draw_bitmap(BMP_CHARACTER_UP, pos_player[0][0], pos_player[0][1], 0); break;
-			//case 1:al_draw_bitmap(BMP_CHARACTER_DOWN, pos_player[0][0], pos_player[0][1], 0); break;
-			//case 2:al_draw_bitmap(BMP_CHARACTER_LEFT, pos_player[0][0], pos_player[0][1], 0); break;
-			//case 3: al_draw_bitmap(BMP_CHARACTER_RIGHT, pos_player[0][0], pos_player[0][1], 0); break;
-			case 0:al_draw_scaled_bitmap(BMP_CHARACTER_UP, 0,0, width_character,height_character, pos_player[0][0], pos_player[0][1], width_character*scale[0], height_character*scale[1], 0); break;
-			case 1:al_draw_scaled_bitmap(BMP_CHARACTER_DOWN, 0, 0, width_character, height_character, pos_player[0][0], pos_player[0][1], width_character*scale[0], height_character*scale[1], 0); break;
-			case 2:al_draw_scaled_bitmap(BMP_CHARACTER_LEFT, 0, 0, width_character, height_character, pos_player[0][0], pos_player[0][1], width_character*scale[0], height_character*scale[1], 0); break;
-			case 3:al_draw_scaled_bitmap(BMP_CHARACTER_RIGHT, 0, 0, width_character, height_character, pos_player[0][0], pos_player[0][1], width_character*scale[0], height_character*scale[1], 0); break;
-			}
-			if (number_of_players[1] == true) {
-				switch (direction[1]) {
-				//case 0:al_draw_bitmap(BMP_CHARACTER_UP_2, pos_player[1][0], pos_player[1][1], 0); break;
-				//case 1:al_draw_bitmap(BMP_CHARACTER_DOWN_2, pos_player[1][0], pos_player[1][1], 0); break;
-				//case 2:al_draw_bitmap(BMP_CHARACTER_LEFT_2, pos_player[1][0], pos_player[1][1], 0); break;
-				//case 3: al_draw_bitmap(BMP_CHARACTER_RIGHT_2, pos_player[1][0], pos_player[1][1], 0); break;
-				case 0:al_draw_scaled_bitmap(BMP_CHARACTER_UP_2, 0, 0, width_character, height_character, pos_player[1][0], pos_player[1][1], width_character*scale[0], height_character*scale[1], 0); break;
-				case 1:al_draw_scaled_bitmap(BMP_CHARACTER_DOWN_2, 0, 0, width_character, height_character, pos_player[1][0], pos_player[1][1], width_character*scale[0], height_character*scale[1], 0); break;
-				case 2:al_draw_scaled_bitmap(BMP_CHARACTER_LEFT_2, 0, 0, width_character, height_character, pos_player[1][0], pos_player[1][1], width_character*scale[0], height_character*scale[1], 0); break;
-				case 3:al_draw_scaled_bitmap(BMP_CHARACTER_RIGHT_2, 0, 0, width_character, height_character, pos_player[1][0], pos_player[1][1], width_character*scale[0], height_character*scale[1], 0); break;
+					if (pos_player[1][1] <= 0) pos_player[1][1] = 0;
+					if (pos_player[1][0] <= 0) pos_player[1][0] = 0;
+					if (pos_player[1][1] + height_character >= height) pos_player[1][1] = height - height_character;
+					if (pos_player[1][0] + width_character >= width) pos_player[1][0] = width - width_character;
+					if (collision(pos_player[1][0], width_character, SYMBOL[0], width_symbol, pos_player[1][1], height_character, SYMBOL[1], height_symbol)) {
+						pos_player[1][0] = last_pos_player[1][0];
+						pos_player[1][1] = last_pos_player[1][1];
+					}
+					for (int i = 0; i < MAX_BONUS; i++) {
+						if (Bonus[i].alive && collision(pos_player[1][0], width_character, Bonus[i].x, Bonus[i].width, pos_player[1][1], height_character, Bonus[i].y, Bonus[i].height)) {
+							switch (Bonus[i].type) {
+							case 0: {
+								if (player_timer_cooldown[3] <= 0) {
+									immunity[1] = true;
+									player_timer_cooldown[3] = TIME_OF_BEEING_UNDEAD;
+								}
+								Bonus[i].alive = 0;
+								break;
+							}
+							case 1: {
+								for (int j = 0; j < MAX_NUMBER_OF_ENEMIES; j++) {
+									if (Przeciwnik[j].alive == 1 && Przeciwnik[j].died == 0) {
+										Przeciwnik[j].alive = 0;
+										Przeciwnik[j].died = 1;
+										Przeciwnik[j].lifes = 0;
+										Przeciwnik[j].boss = 0;
+										Bonus[i].alive = 0;
+										enemies_killed++;
+										enemies_count--;
+									}
+								}
+								if (enemies_killed == MAX_NUMBER_OF_ENEMIES) {
+									al_draw_bitmap(BMP_START, 0, 0, 0);
+									al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
+									al_flip_display();
+									al_stop_timer(timer_stage);
+									clean_everything();
+									enemies_killed = 0;
+									al_rest(10.0);
+									al_start_timer(timer_stage);
+									draw_stage(++stage);
+								}
+								break;
+							}
+							case 2: {
+								if (freeze_time <= 0) {
+									frozen = true;
+									freeze_time = FREEZE_ON_ENEMIES;
+								}
+								Bonus[i].alive = 0;
+								break;
+							}
+							case 3: {
+								Bonus[i].alive = 0;
+								player_lifes[1]++;
+								break;
+							}
+							case 4: {
+								Bonus[i].alive = 0;
+								for (int i = 13; i <= 15; i++) {
+									if (objMap[9][i] == 0)
+										objMap[9][i] = 1;
+								}
+								if (objMap[10][13] == 0)
+									objMap[10][13] = 1;
+								if (objMap[10][15] == 0)
+									objMap[10][15] = 1;
+								break;
+							}
+							}
+						}
+					}
 				}
-			}
-			draw_bullets(bullets);
-			draw_enemies(Przeciwnik);
-			draw_bonus(Bonus);
-			if(number_of_players[1] == false)
-				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), pos_score_x, 0, 0, "Wynik: %d, Zyc: %d", global_score, player_lifes[0]);
-			else
-				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), pos_score_x, 0, 0, "Wynik: %d, Zyc[1]: %d, Zyc[2]: %d", global_score, player_lifes[0], player_lifes[1]);
-			create_enemy(Przeciwnik);
-			for (int t = 0; t < 11; t++) {
-				for (int i = 0; i < 28; i++) {
-					if (objMap[t][i] == 1)
-						//al_draw_bitmap(BMP_TEXTURE_1, i * 48, t * 70, 0);
-						al_draw_scaled_bitmap(BMP_TEXTURE_1, 0, 0, texture_size[0], texture_size[1], i * 48*scale[0], t * 70*scale[1], texture_size[0] * scale[0], texture_size[1] * scale[1], 0);
+
+				switch (direction[0]) {
+					//case 0:al_draw_bitmap(BMP_CHARACTER_UP, pos_player[0][0], pos_player[0][1], 0); break;
+					//case 1:al_draw_bitmap(BMP_CHARACTER_DOWN, pos_player[0][0], pos_player[0][1], 0); break;
+					//case 2:al_draw_bitmap(BMP_CHARACTER_LEFT, pos_player[0][0], pos_player[0][1], 0); break;
+					//case 3: al_draw_bitmap(BMP_CHARACTER_RIGHT, pos_player[0][0], pos_player[0][1], 0); break;
+				case 0:al_draw_scaled_bitmap(BMP_CHARACTER_UP, 0, 0, width_character, height_character, pos_player[0][0], pos_player[0][1], width_character*scale[0], height_character*scale[1], 0); break;
+				case 1:al_draw_scaled_bitmap(BMP_CHARACTER_DOWN, 0, 0, width_character, height_character, pos_player[0][0], pos_player[0][1], width_character*scale[0], height_character*scale[1], 0); break;
+				case 2:al_draw_scaled_bitmap(BMP_CHARACTER_LEFT, 0, 0, width_character, height_character, pos_player[0][0], pos_player[0][1], width_character*scale[0], height_character*scale[1], 0); break;
+				case 3:al_draw_scaled_bitmap(BMP_CHARACTER_RIGHT, 0, 0, width_character, height_character, pos_player[0][0], pos_player[0][1], width_character*scale[0], height_character*scale[1], 0); break;
 				}
+				if (number_of_players[1] == true) {
+					switch (direction[1]) {
+						//case 0:al_draw_bitmap(BMP_CHARACTER_UP_2, pos_player[1][0], pos_player[1][1], 0); break;
+						//case 1:al_draw_bitmap(BMP_CHARACTER_DOWN_2, pos_player[1][0], pos_player[1][1], 0); break;
+						//case 2:al_draw_bitmap(BMP_CHARACTER_LEFT_2, pos_player[1][0], pos_player[1][1], 0); break;
+						//case 3: al_draw_bitmap(BMP_CHARACTER_RIGHT_2, pos_player[1][0], pos_player[1][1], 0); break;
+					case 0:al_draw_scaled_bitmap(BMP_CHARACTER_UP_2, 0, 0, width_character, height_character, pos_player[1][0], pos_player[1][1], width_character*scale[0], height_character*scale[1], 0); break;
+					case 1:al_draw_scaled_bitmap(BMP_CHARACTER_DOWN_2, 0, 0, width_character, height_character, pos_player[1][0], pos_player[1][1], width_character*scale[0], height_character*scale[1], 0); break;
+					case 2:al_draw_scaled_bitmap(BMP_CHARACTER_LEFT_2, 0, 0, width_character, height_character, pos_player[1][0], pos_player[1][1], width_character*scale[0], height_character*scale[1], 0); break;
+					case 3:al_draw_scaled_bitmap(BMP_CHARACTER_RIGHT_2, 0, 0, width_character, height_character, pos_player[1][0], pos_player[1][1], width_character*scale[0], height_character*scale[1], 0); break;
+					}
+				}
+				draw_bullets(bullets);
+				draw_enemies(Przeciwnik);
+				draw_bonus(Bonus);
+				if (number_of_players[1] == false)
+					al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), pos_score_x, 0, 0, "Wynik: %d, Zyc: %d", global_score, player_lifes[0]);
+				else
+					al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), pos_score_x, 0, 0, "Wynik: %d, Zyc[1]: %d, Zyc[2]: %d", global_score, player_lifes[0], player_lifes[1]);
+				create_enemy(Przeciwnik);
+				for (int t = 0; t < 11; t++) {
+					for (int i = 0; i < 28; i++) {
+						if (objMap[t][i] == 1)
+							//al_draw_bitmap(BMP_TEXTURE_1, i * 48, t * 70, 0);
+							al_draw_scaled_bitmap(BMP_TEXTURE_1, 0, 0, texture_size[0], texture_size[1], i * 48 * scale[0], t * 70 * scale[1], texture_size[0] * scale[0], texture_size[1] * scale[1], 0);
+					}
+				}
+				al_flip_display();
 			}
-			al_flip_display();
-		}
 
 	}
 }
