@@ -29,6 +29,7 @@
 #define PROBABILITY_THAT_BOSS_RESPAWNS 5
 #define POINTS_FOR_ENEMY 100
 #define POINTS_FOR_BOSS 200
+#define POINTS_FOR_BONUS 100
 #define SIZE_FONT 30
 #define MAX_BONUS 10
 #define DEFAULT_WIDTH 1366
@@ -68,8 +69,9 @@ float scale[2];
 float DeltaTime = 1.0 / FPS;
 int stage = 1;
 int enemies_killed = 0;
+int count_on_objects[2][3] = { 0,0,0,0,0,0 }; // 0 - normal enemy, 1 - boss, 2 - bonus
 int enemies_count = 0;
-int global_score = 0;
+int global_score[2] = { 0,0 };
 int enemy_size[2], main_screen_size[2];
 int bullets_size[2], bullets_size_enemy[2];
 int texture_size[2];
@@ -537,7 +539,7 @@ void pre_start_game() {
 		player_alive[1] = true;
 	}
 	else player_alive[1] = false;
-	int pos_score_x = ceil(width * 2 / 3);
+	int pos_score_x = ceil(width * 2 / 4);
 	int pos_symbol_y = floor(height * 0.92);
 	int last_pos_comp[MAX_NUMBER_OF_ENEMIES][2];
 	int SYMBOL[2] = { width / 2, pos_symbol_y };
@@ -753,11 +755,16 @@ void pre_start_game() {
 								if (--Przeciwnik[j].lifes == 0) {
 									if (Przeciwnik[j].boss) {
 										Przeciwnik[j].boss = 0;
-										global_score += POINTS_FOR_BOSS;
 										temp = create_bonus(Bonus, Przeciwnik[j].x, Przeciwnik[j].y);
 										Bonus[temp].alive = 1;
+										if (bullets[i].whose == 0) { count_on_objects[0][1]++; global_score[0] += POINTS_FOR_BOSS; }
+										else if (bullets[i].whose == 2) { count_on_objects[1][1]++;  global_score[1] += POINTS_FOR_BOSS; }
 									}
-									else global_score += POINTS_FOR_ENEMY;
+									else {
+						
+										if (bullets[i].whose == 0) { count_on_objects[0][0]++; global_score[0] += POINTS_FOR_ENEMY; }
+										else if (bullets[i].whose == 2){ count_on_objects[1][0]++; global_score[1] += POINTS_FOR_ENEMY; }
+									}
 									Przeciwnik[j].alive = 0;
 									Przeciwnik[j].died = 1;
 									enemies_killed++;
@@ -855,6 +862,8 @@ void pre_start_game() {
 					}
 					for (int i = 0; i < MAX_BONUS; i++) {
 						if (Bonus[i].alive && collision(pos_player[0][0], width_character, Bonus[i].x, Bonus[i].width, pos_player[0][1], height_character, Bonus[i].y, Bonus[i].height)) {
+							count_on_objects[0][2]++;
+							global_score[0] += POINTS_FOR_BONUS;
 							switch (Bonus[i].type) {
 							case 0: {
 								if (player_timer_cooldown[2] <= 0) {
@@ -938,6 +947,8 @@ void pre_start_game() {
 					}
 					for (int i = 0; i < MAX_BONUS; i++) {
 						if (Bonus[i].alive && collision(pos_player[1][0], width_character, Bonus[i].x, Bonus[i].width, pos_player[1][1], height_character, Bonus[i].y, Bonus[i].height)) {
+							count_on_objects[1][2]++;
+							global_score[1] += POINTS_FOR_BONUS;
 							switch (Bonus[i].type) {
 							case 0: {
 								if (player_timer_cooldown[3] <= 0) {
@@ -1028,9 +1039,9 @@ void pre_start_game() {
 				draw_enemies(Przeciwnik);
 				draw_bonus(Bonus);
 				if (number_of_players[1] == false)
-					al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), pos_score_x, 0, 0, "Wynik: %d, Zyc: %d", global_score, player_lifes[0]);
+					al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), pos_score_x, 0, 0, "Wynik: %d, Zyc: %d", global_score[0], player_lifes[0]);
 				else
-					al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), pos_score_x, 0, 0, "Wynik: %d, Zyc[1]: %d, Zyc[2]: %d", global_score, player_lifes[0], player_lifes[1]);
+					al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), pos_score_x, 0, 0, "Wynik1 : %d, Wynik2 : %d Zyc[1]: %d, Zyc[2]: %d", global_score[0],global_score[1], player_lifes[0], player_lifes[1]);
 				create_enemy(Przeciwnik);
 				for (int t = 0; t < 11; t++) {
 					for (int i = 0; i < 28; i++) {
