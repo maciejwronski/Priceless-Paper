@@ -26,7 +26,7 @@
 #define COOLDOWN_ON_ENEMIES_SHOTS 0.5f
 #define PROBABILITY_THAT_ENEMY_SHOOTS 400
 #define PROBABILITY_THAT_ENEMY_RESPAWNS 100
-#define PROBABILITY_THAT_BOSS_RESPAWNS 5
+#define PROBABILITY_THAT_BOSS_RESPAWNS 3
 #define POINTS_FOR_ENEMY 100
 #define POINTS_FOR_BOSS 200
 #define POINTS_FOR_BONUS 100
@@ -46,13 +46,14 @@
 ////////////////////////////////// CONFIGURATION ////////////////////////////////
 ////////////VARIABLES//////////////
 bool left = false;
+bool again_in_lobby = false;
 bool is_back = true;
 bool locked[] = { false };
 bool keys[5] = { false, false, false, false, false };
 bool keys1[5] = { false, false, false, false, false };
 int menu[] = { 0, 0, 0 };
 int count_enter = 0;
-int remember, enter_once_more_time;
+int remember;
 bool music_on = true;
 bool last_music_option = true;
 bool left_menu = false;
@@ -67,7 +68,7 @@ int player_lifes[2] = { 1,1 };
 int direction[2] = { -1 };
 float scale[2];
 float DeltaTime = 1.0 / FPS;
-int stage = 1;
+int stage = 7;
 int enemies_killed = 0;
 int count_on_objects[2][3] = { 0,0,0,0,0,0 }; // 0 - normal enemy, 1 - boss, 2 - bonus
 int enemies_count = 0;
@@ -90,7 +91,7 @@ int objMap[11][28] =
 { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
 { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-{ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+{ 0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 { 0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -144,7 +145,8 @@ ALLEGRO_BITMAP *BMP_RENOVATION = NULL;
 // music sample //
 ALLEGRO_SAMPLE *sample = NULL;
 // font
-
+ALLEGRO_TIMER *timer_stage = NULL;
+ALLEGRO_TIMER *timer = NULL;
 int width, height;
 
 typedef struct obiekt {
@@ -486,8 +488,13 @@ void draw_stage(int ktory) {
 		al_flip_display();
 		break;
 	}
+	case 8: {
+		again_in_lobby = true;
+		break;
+	}
 	}
 }
+
 void clean_everything() {
 	if (number_of_players[0] == true) {
 		pos_player[0][0] = width / 2 - 100;
@@ -519,7 +526,6 @@ void clean_everything() {
 }
 void pre_start_game() {
 	ALLEGRO_EVENT_QUEUE *event_queue_stage = NULL;
-	ALLEGRO_TIMER *timer_stage = NULL;
 	ALLEGRO_FONT *FONT_SCORE = al_load_font("fonts/georgia.ttf", SIZE_FONT, 0);
 	int i, temp;
 	event_queue_stage = al_create_event_queue();
@@ -527,7 +533,7 @@ void pre_start_game() {
 	al_start_timer(timer_stage);
 	al_register_event_source(event_queue_stage, al_get_keyboard_event_source());
 	al_register_event_source(event_queue_stage, al_get_timer_event_source(timer_stage));
-	draw_stage(1);
+	draw_stage(stage);
 	int width_symbol = al_get_bitmap_width(BMP_SYMBOL);
 	int height_symbol = al_get_bitmap_height(BMP_SYMBOL);
 	int height_character = al_get_bitmap_height(BMP_CHARACTER_UP);
@@ -570,8 +576,38 @@ void pre_start_game() {
 			if (enemy_timer_cooldown[0][i] > 0.0f)
 				enemy_timer_cooldown[0][i] = enemy_timer_cooldown[0][i] - (DeltaTime);
 		if (ev.type == ALLEGRO_EVENT_KEY_DOWN) {
-			switch (ev.keyboard.keycode)
-			{
+			switch (ev.keyboard.keycode){
+			if(again_in_lobby == true){
+				case ALLEGRO_KEY_ENTER:
+					again_in_lobby = false;
+					al_stop_timer(timer_stage);
+					BMP_START = al_load_bitmap("wejsciowe/tlo_podstawowe2.png");
+					enemies_killed = 0;
+					count_enter = 1;
+					menu[0] = 0;
+					menu[1] = 0;
+					menu[2] = 0;
+					remember = -10;
+					global_score[0] = 0;
+					global_score[1] = 0;
+					count_enter_choice = 0;
+					enemies_killed = 0;
+					enemies_count = 0;
+					player_lifes[0] = 1;
+					player_lifes[1] = 1;
+					player_alive[0] = true;
+					player_alive[1] = true;
+					is_back = true;
+					for (int i = 0; i < 2; i++)
+						for (int j = 0; j < 3; j++)
+							count_on_objects[i][j] = 0;
+					stage = 1;
+					left_menu = false;
+					in_game = false;
+					al_start_timer(timer);
+					al_flip_display();
+					break;
+			}
 				if (number_of_players[1] == true) {
 			case ALLEGRO_KEY_W:
 				keys1[W] = true;
@@ -665,7 +701,7 @@ void pre_start_game() {
 				break;
 			}
 		}
-		else if (ev.type == ALLEGRO_EVENT_TIMER) {
+		else if (ev.type == ALLEGRO_EVENT_TIMER && again_in_lobby == false) {
 			//al_draw_bitmap(BMP_START, 0, 0, 0);
 			al_draw_scaled_bitmap(BMP_START, 0, 0, al_get_bitmap_width(BMP_START), al_get_bitmap_height(BMP_START), 0, 0, al_get_bitmap_width(BMP_START)*scale[0], al_get_bitmap_height(BMP_START)*scale[1], 0);
 			//al_draw_bitmap(BMP_SYMBOL, SYMBOL[0], SYMBOL[1], 0);
@@ -772,12 +808,16 @@ void pre_start_game() {
 								}
 								if (enemies_killed >= MAX_NUMBER_OF_ENEMIES) {
 									al_draw_bitmap(BMP_START, 0, 0, 0);
-									al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
+									if (stage <= 6) {
+										al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
+									}
 									al_flip_display();
-									al_stop_timer(timer_stage);
-									clean_everything();
 									enemies_killed = 0;
-									al_rest(1.0);
+									al_stop_timer(timer_stage);
+									if (stage <= 6) {
+									al_rest(2.0);
+									}
+									clean_everything();
 									al_start_timer(timer_stage);
 									draw_stage(++stage);
 								}
@@ -790,6 +830,8 @@ void pre_start_game() {
 							pos_player[0][0] = -100;
 							pos_player[0][1] = -100;
 						}
+						if (player_lifes[0] == 0 && number_of_players[1] == false)
+							again_in_lobby = true;
 						if (!immunity[0] && bullets[i].whose == 1 && collision(bullets[i].x, bullets_size[0], pos_player[0][0], width_character, bullets[i].y, bullets_size[1], pos_player[0][1], height_character) && player_lifes[0] > 1) {
 							pos_player[0][0] = width / 2 - 100;
 							pos_player[0][1] = height - 80;
@@ -802,6 +844,8 @@ void pre_start_game() {
 							pos_player[1][0] = -100;
 							pos_player[1][1] = -100;
 						}
+						if (player_lifes[0] == 0 && player_lifes[1] == 0 && number_of_players[1] == true)
+							again_in_lobby = true;
 						if (!immunity[1] && bullets[i].whose == 1 && collision(bullets[i].x, bullets_size[0], pos_player[0][0], width_character, bullets[i].y, bullets_size[1], pos_player[0][1], height_character) && player_lifes[1] > 1) {
 							pos_player[1][0] = width / 2 - 100;
 							pos_player[1][1] = height - 80;
@@ -887,14 +931,20 @@ void pre_start_game() {
 								}
 								if (enemies_killed == MAX_NUMBER_OF_ENEMIES) {
 									al_draw_bitmap(BMP_START, 0, 0, 0);
-									al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
+									if (stage <= 6) {
+										al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
+									}
 									al_flip_display();
 									al_stop_timer(timer_stage);
 									clean_everything();
 									enemies_killed = 0;
-									al_rest(10.0);
+									if (stage <= 6) {
+										al_rest(2.0);
+									}
 									al_start_timer(timer_stage);
 									draw_stage(++stage);
+									
+
 								}
 								break;
 							}
@@ -972,12 +1022,16 @@ void pre_start_game() {
 								}
 								if (enemies_killed == MAX_NUMBER_OF_ENEMIES) {
 									al_draw_bitmap(BMP_START, 0, 0, 0);
-									al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
+									if (stage <=6 ) {
+										al_draw_bitmap(BMP_SEMESTER_OVER, width / 3, height / 2, 0);
+									}
 									al_flip_display();
-									al_stop_timer(timer_stage);
-									clean_everything();
 									enemies_killed = 0;
-									al_rest(10.0);
+									al_stop_timer(timer_stage);
+									if (stage <= 6) {
+									al_rest(2.0);
+									}
+									clean_everything();
 									al_start_timer(timer_stage);
 									draw_stage(++stage);
 								}
@@ -1052,6 +1106,38 @@ void pre_start_game() {
 				}
 				al_flip_display();
 			}
+		else if (ev.type == ALLEGRO_EVENT_TIMER && again_in_lobby == true) {
+			al_clear_to_color(al_map_rgb(255, 255, 255));
+			if (number_of_players[1] == false) {
+				int jedna_druga = width / 2;
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), jedna_druga, 0,0, "Twoj wynik:");
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), jedna_druga, 50, 0, "Wynik: %d", global_score[0]);
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), jedna_druga, 100, 0, "Zabitych przeciwnikow: %d", count_on_objects[0][0]);
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), jedna_druga, 150, 0, "Zabitych bossow: %d", count_on_objects[0][1]);
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), jedna_druga, 200, 0, "Zebranych bonusow: %d", count_on_objects[0][2]);
+
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), jedna_druga, 400, 0, "Wcisnij enter by powrocic do wyboru ilosci graczy.");
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), jedna_druga, 450, 0, "Lub escape by opuscic gre.");
+			}
+			if (number_of_players[1] == true) {
+				int jedna_czwarta = width*0.25;
+				int trzy_czwarte = width*0.75;
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), jedna_czwarta, 0, 0, "Gracz 1:");
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), jedna_czwarta, 50, 0, "Wynik: %d", global_score[0]);
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), jedna_czwarta, 100, 0, "Zabitych przeciwnikow: %d", count_on_objects[0][0]);
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), jedna_czwarta, 150, 0, "Zabitych bossow: %d", count_on_objects[0][1]);
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), jedna_czwarta, 200, 0, "Zebranych bonusow: %d", count_on_objects[0][2]);
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), trzy_czwarte, 0, 0, "Gracz 2:");
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), trzy_czwarte, 50, 0, "Wynik: %d", global_score[1]);
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), trzy_czwarte, 100, 0, "Zabitych przeciwnikow: %d", count_on_objects[1][0]);
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), trzy_czwarte, 150, 0, "Zabitych bossow: %d", count_on_objects[1][1]);
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), trzy_czwarte, 200, 0, "Zebranych bonusow: %d", count_on_objects[1][2]);
+
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), jedna_czwarta, 400, 0, "Wcisnij enter by powrocic do wyboru ilosci graczy.");
+				al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), jedna_czwarta, 450, 0, "Lub escape by opuscic gre.");
+			}
+				al_flip_display();
+			}
 
 	}
 }
@@ -1061,7 +1147,6 @@ int main(void) {
 	ALLEGRO_DISPLAY *display = NULL;
 
 	ALLEGRO_EVENT_QUEUE *event_queue = NULL;
-	ALLEGRO_TIMER *timer = NULL;
 	if (!al_init()){
 		int error;
 		printf("Allegro didnt load correctly. Program will exit\nPress any key to continue");
@@ -1263,6 +1348,8 @@ int main(void) {
 				break;
 			case ALLEGRO_KEY_ENTER:
 				count_enter++;
+				if(again_in_lobby = false)
+				again_in_lobby = true;
 				switch (menu[0]) {
 				case 0:
 					if (!locked[0]) {
@@ -1273,8 +1360,8 @@ int main(void) {
 					remember = 0;
 					if (count_enter > 1) {
 						switch (menu[1]) {
-						case 0: number_of_players[0] = true; number_of_players[1] = false; left_menu = true; in_game = true; al_clear_to_color(al_map_rgb(0, 0, 0)); pre_start_game(); break;
-						case 1:  number_of_players[0] = true; number_of_players[1] = true; left_menu = true; in_game = true; al_clear_to_color(al_map_rgb(0, 0, 0));  pre_start_game(); break;
+						case 0: number_of_players[0] = true; number_of_players[1] = false; left_menu = true; in_game = true;al_clear_to_color(al_map_rgb(0, 0, 0)); al_stop_timer(timer);  pre_start_game(); break;
+						case 1:  number_of_players[0] = true; number_of_players[1] = true; left_menu = true; in_game = true; al_clear_to_color(al_map_rgb(0, 0, 0)); al_stop_timer(timer); pre_start_game(); break;
 						}
 						count_enter--;
 					}
