@@ -1415,10 +1415,6 @@ void pre_start_game() {
 				draw_bullets(bullets);
 				draw_enemies(Przeciwnik);
 				draw_bonus(Bonus);
-				if (number_of_players[1] == false)
-					al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), pos_score_x, 0, 0, "Wynik: %d, Zyc: %d", global_score[0], player_lifes[0]);
-				else
-					al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), pos_score_x, 0, 0, "Wynik1 : %d, Wynik2 : %d Zyc[1]: %d, Zyc[2]: %d", global_score[0],global_score[1], player_lifes[0], player_lifes[1]);
 				create_enemy(Przeciwnik);
 				for (int t = 0; t < 11; t++) {
 					for (int i = 0; i < 28; i++) {
@@ -1427,6 +1423,10 @@ void pre_start_game() {
 							al_draw_scaled_bitmap(BMP_TEXTURE_1, 0, 0, texture_size[0], texture_size[1], i * 48 * scale[0], t * 70 * scale[1], texture_size[0] * scale[0], texture_size[1] * scale[1], 0);
 					}
 				}
+				if (number_of_players[1] == false)
+					al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), pos_score_x, 0, 0, "Wynik: %d, Zyc: %d", global_score[0], player_lifes[0]);
+				else
+					al_draw_textf(FONT_SCORE, al_map_rgb(255, 0, 0), pos_score_x, 0, 0, "Wynik1 : %d, Wynik2 : %d Zyc[1]: %d, Zyc[2]: %d", global_score[0], global_score[1], player_lifes[0], player_lifes[1]);
 				al_flip_display();
 			}
 		else if (ev.type == ALLEGRO_EVENT_TIMER && again_in_lobby == true) {
@@ -1572,7 +1572,7 @@ int main(void) {
 	al_start_timer(timer);
 	al_flip_display();
 	al_stop_samples();
-	//al_play_sample(sample, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
+	al_play_sample(sample, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
 	srand(time(NULL));
 	constants_to_set_graphics[0][0] = width*0.36;
 	constants_to_set_graphics[0][1] = height*0.44;
